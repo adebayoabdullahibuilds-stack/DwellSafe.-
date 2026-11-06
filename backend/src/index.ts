@@ -73,5 +73,5 @@ app.get('/api/verification-status', (_req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`DwellSafe backend listening on http://localhost:${port}`);
+  console.log(`Legacy Express API retained for migration rollback on http://localhost:${port}`);
 });

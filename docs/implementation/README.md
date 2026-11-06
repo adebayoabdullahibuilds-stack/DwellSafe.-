@@ -1,23 +1,23 @@
 # Implementation Guide
 
-## Phase 1
+## Current foundation
 
-- scaffold frontend and backend workspaces
-- establish API and document schemas
-- create trust and verification data models
-- implement landing page and listing cards
+- Responsive React marketplace and fictional property discovery UI.
+- Browser-only tenant and landlord demo profiles, apartment records, and tenant-request workflows; these are not secure authentication or production persistence.
+- NestJS backend replacing the original single-file Express API, with compatible health, demo listing, and verification-status endpoints.
+- PostgreSQL/Prisma schema and initial migration for property listings and verification decisions; no fictional seed data.
+- CORS allowlist, environment validation, API input validation, consistent errors, and development Swagger.
+- Jest unit tests and backend setup/API/database documentation.
 
-## Phase 2
+Production authentication, server-backed marketplace workflows, verification review, and persistent account/occupancy models remain future milestones.
 
-- add authentication and role-based access
-- enable landlord and agent workflows
-- add verification review and moderation tooling
+## Documentation
 
-## Phase 3
-
-- wire persistent storage
-- add notification pipelines
-- validate cross-layer business flows with tests
+- [Project status](./PROJECT-STATUS.md)
+- [Backend architecture](./BACKEND_ARCHITECTURE.md)
+- [Database schema](./DATABASE_SCHEMA.md)
+- [API specification](./API_SPECIFICATION.md)
+- [Backend setup](./BACKEND_SETUP.md)
 
 ## Validation
 

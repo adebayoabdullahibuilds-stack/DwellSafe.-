@@ -7,17 +7,22 @@ This frontend provides a responsive marketplace interface for property discovery
 - `/` — homepage with a search form, popular locations, featured sample homes, and an explanation of verification.
 - `/properties` — searchable and filterable sample listings. Search values are read from URL query parameters such as `location`, `type`, `minRent`, and `maxRent`.
 - `/properties/:id` — details for a sample property.
-- `/register/landlord` and `/register/agent` — role-specific onboarding forms.
+- `/register` — choose a tenant or landlord account type.
+- `/register/tenant`, `/register/landlord`, and `/register/agent` — role-specific demo registration forms.
 - `/login` and `/forgot-password` — authentication UI states.
-- `/landlord/dashboard` and `/agent/dashboard` — protected placeholders; access is denied until server authentication and role checks exist.
+- `/tenant/dashboard` — current demo apartment and tenant request status.
+- `/landlord/dashboard` — demo apartment portfolio, occupants, incoming tenant requests, and apartment creation.
+- `/agent/dashboard` — agent dashboard placeholder.
 
 The listings in `src/data/listings.ts` are fictional demonstration data. They are labelled as demo listings and pending verification; none are represented as genuinely verified or available properties.
 
-## Authentication status
+## Demo account and data status
 
-There is currently no authentication provider, account database, session service, registration API, or password-recovery integration in this repository. The account forms validate user input in the browser but intentionally do not submit or store it. They show a setup message instead of simulating account creation, sign-in, or email delivery.
+The tenant and landlord flows are browser-only prototypes. Demo account profiles, landlord-created apartments, tenant requests, and assignments are stored in the current browser's `localStorage`; they are not sent to the backend or shared across devices. Registration does not store passwords. Demo sign-in selects a saved profile by email and does not authenticate or verify identity. Clearing this site's browser storage removes demo data. Do not enter real personal or property information.
 
-Before enabling these flows, configure a trusted server-side identity provider or implement equivalent backend services for:
+Landlords can add demo apartments and accept or decline tenant requests. Accepting a request assigns the tenant as the apartment's occupant. The listings page can filter sample and landlord-created demo apartments by category, location, and rent. These actions are not suitable for real-world use.
+
+Before enabling production account and property flows, configure a trusted server-side identity provider or implement equivalent backend services for:
 
 - account registration with role assigned and persisted by the server;
 - sign-in and sign-out using secure, `HttpOnly`, `Secure`, `SameSite` session cookies;
@@ -25,7 +30,7 @@ Before enabling these flows, configure a trusted server-side identity provider o
 - password-reset tokens with expiry, rate limits, and a real email delivery service;
 - consent and published privacy/terms policies.
 
-The existing backend does not provide these authentication endpoints. To connect a future implementation, configure `VITE_API_URL` to the public HTTPS API base and provide server-side implementations for role-specific registration, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/session`, and `POST /api/auth/password-reset`. The session endpoint must return the account's server-assigned role; dashboard authorization must also be enforced on the server for protected data and actions. Password-reset must only report success after the configured mail provider accepts the request. Keep provider secrets and signing keys on the server; never expose them through `VITE_*` variables.
+The existing backend does not provide authentication, apartment-management, or tenant-request endpoints. A production implementation should use server-side storage and authorization for accounts, listings, apartment occupancy, and request decisions. Dashboard authorization must be enforced on the server for protected data and actions. Password-reset must only report success after the configured mail provider accepts the request. Keep provider secrets and signing keys on the server; never expose them through `VITE_*` variables.
 
 Do not treat a client-selected role or registration as verification. Do not request identity or property evidence until secure storage, access controls, retention rules, and the review workflow are implemented.
 

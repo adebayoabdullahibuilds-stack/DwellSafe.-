@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { listings, type PropertyListing } from './data/listings';
 import {
+  activeDemoAccount,
+  demoApartmentListing,
+  readDemoState,
+  requestDemoApartment,
+  type DemoState,
+} from './data/demoStore';
+import { DashboardPage } from './components/Dashboard';
+import {
   AuthPage,
-  ProtectedDashboardPage,
   type AuthRoute,
 } from './components/AuthPages';
 
@@ -25,7 +32,7 @@ const emptyFilters: Filters = {
 };
 
 const locations = ['Lekki', 'Yaba', 'Ikeja', 'Surulere', 'Abuja', 'Ibadan'];
-const propertyTypes = ['Self-contained', 'Mini flat', '2-bedroom flat'];
+const propertyTypes = ['Self-contained', 'Mini flat', '2-bedroom flat', '3-bedroom flat', 'Duplex'];
 
 function readFiltersFromUrl(): Filters {
   const params = new URLSearchParams(window.location.search);
@@ -93,12 +100,12 @@ function Header() {
           <a href="/#for-agents" onClick={() => setMenuOpen(false)}>For agents</a>
           <div className="mobile-nav-actions">
             <a className="button button-outline" href="/login">Sign in</a>
-            <a className="button button-primary" href="/register/landlord">Get started</a>
+            <a className="button button-primary" href="/register">Get started</a>
           </div>
         </nav>
         <div className="header-actions">
           <a className="sign-in-link" href="/login">Sign in</a>
-          <a className="button button-primary header-cta" href="/register/landlord">Get started</a>
+          <a className="button button-primary header-cta" href="/register">Get started</a>
         </div>
       </div>
     </header>
@@ -140,7 +147,7 @@ function DemoBadge() {
   return <span className="demo-badge"><span aria-hidden="true">●</span> Demo listing</span>;
 }
 
-function PropertyCard({ listing }: { listing: PropertyListing }) {
+function PropertyCard({ listing, action }: { listing: PropertyListing; action?: React.ReactNode }) {
   return (
     <article className="property-card">
       <a className="property-image-link" href={`/properties/${listing.id}`} aria-label={`View ${listing.title}`}>
@@ -166,6 +173,7 @@ function PropertyCard({ listing }: { listing: PropertyListing }) {
           <p className="property-price">{formatNaira(listing.rent)} <span>/ year</span></p>
           <a className="text-link" href={`/properties/${listing.id}`}>View details <span aria-hidden="true">→</span></a>
         </div>
+        {action}
       </div>
     </article>
   );
@@ -334,6 +342,11 @@ function HomePage() {
 
 function ListingsPage() {
   const [filters, setFilters] = useState<Filters>(readFiltersFromUrl);
+  const [demoState, setDemoState] = useState<DemoState>(() => readDemoState());
+  const [requestMessage, setRequestMessage] = useState('');
+  const account = activeDemoAccount(demoState);
+  const landlordApartments = demoState.apartments.filter((apartment) => apartment.occupantId === null);
+  const availableListings = [...listings, ...landlordApartments.map(demoApartmentListing)];
 
   useEffect(() => {
     const handlePopState = () => setFilters(readFiltersFromUrl());
@@ -343,7 +356,7 @@ function ListingsPage() {
 
   const filteredListings = useMemo(() => {
     const searchTerm = filters.search.trim().toLowerCase();
-    const results = listings.filter((listing) => {
+    const results = availableListings.filter((listing) => {
       const matchesSearch = !searchTerm || `${listing.title} ${listing.location} ${listing.neighborhood} ${listing.state} ${listing.propertyType}`.toLowerCase().includes(searchTerm);
       const matchesLocation = !filters.location || listing.location.toLowerCase() === filters.location.toLowerCase();
       const matchesType = !filters.propertyType || listing.propertyType === filters.propertyType;
@@ -355,7 +368,7 @@ function ListingsPage() {
     if (filters.sort === 'price-low') return results.sort((a, b) => a.rent - b.rent);
     if (filters.sort === 'price-high') return results.sort((a, b) => b.rent - a.rent);
     return results.sort((a, b) => b.relevance - a.relevance);
-  }, [filters]);
+  }, [filters, demoState.apartments]);
 
   const setFilter = (key: keyof Filters, value: string) => {
     const next = { ...filters, [key]: value };
@@ -373,7 +386,7 @@ function ListingsPage() {
       <Header />
       <main className="listings-page section-wrap">
         <div className="listings-heading">
-          <div><p className="eyebrow">Find your next place</p><h1>Homes for rent in Nigeria</h1><p>Browse sample rentals and compare the details that matter to you.</p></div>
+        <div><p className="eyebrow">Find your next place</p><h1>Homes for rent in Nigeria</h1><p>Browse demo rentals by category, location, and budget.</p></div>
           <div className="result-count"><strong>{filteredListings.length}</strong><span>{filteredListings.length === 1 ? 'sample home' : 'sample homes'}</span></div>
         </div>
         <p className="demo-disclaimer listings-disclaimer"><DemoBadge /> These listings are fictional demonstration data, not real homes or agent offers.</p>
@@ -388,14 +401,14 @@ function ListingsPage() {
               <span>Location</span>
               <select value={filters.location} onChange={(event) => setFilter('location', event.target.value)}>
                 <option value="">All locations</option>
-                {locations.map((location) => <option key={location} value={location}>{location}</option>)}
+                {[...new Set([...locations, ...landlordApartments.map((apartment) => apartment.location)])].map((location) => <option key={location} value={location}>{location}</option>)}
               </select>
             </label>
             <label className="filter-field">
               <span>Property type</span>
               <select value={filters.propertyType} onChange={(event) => setFilter('propertyType', event.target.value)}>
                 <option value="">All types</option>
-                {propertyTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+                {[...new Set([...propertyTypes, ...landlordApartments.map((apartment) => apartment.propertyType)])].map((type) => <option key={type} value={type}>{type}</option>)}
               </select>
             </label>
             <fieldset className="rent-filter">
@@ -410,9 +423,36 @@ function ListingsPage() {
               <p><strong>{filteredListings.length}</strong> {filteredListings.length === 1 ? 'home' : 'homes'} found</p>
               <label className="sort-control"><span>Sort by</span><select value={filters.sort} onChange={(event) => setFilter('sort', event.target.value)}><option value="relevance">Relevance</option><option value="price-low">Rent: low to high</option><option value="price-high">Rent: high to low</option></select></label>
             </div>
+            {requestMessage && <div className="form-alert form-alert-warning" role="status">{requestMessage}</div>}
             {filteredListings.length ? (
               <div className="property-grid">
-                {filteredListings.map((listing) => <PropertyCard key={listing.id} listing={listing} />)}
+                {filteredListings.map((listing) => {
+                  const apartment = landlordApartments.find((saved) => saved.id === listing.id);
+                  const previousRequest = apartment && account
+                    ? demoState.requests.find((request) => request.apartmentId === apartment.id && request.tenantId === account.id)
+                    : undefined;
+                  let action: React.ReactNode;
+                  if (apartment && account?.role === 'tenant') {
+                    if (previousRequest) {
+                      action = <p className={`request-status is-${previousRequest.status}`}>Request {previousRequest.status}</p>;
+                    } else {
+                      action = <button className="button button-primary property-request-button" type="button" onClick={() => {
+                        try {
+                          requestDemoApartment(apartment.id, account.id);
+                          setDemoState(readDemoState());
+                          setRequestMessage('Request sent to the landlord. You can track it from your tenant dashboard.');
+                        } catch (error) {
+                          setRequestMessage(error instanceof Error ? error.message : 'Could not send this demo request.');
+                        }
+                      }}>Request this apartment</button>;
+                    }
+                  } else if (apartment && !account) {
+                    action = <a className="button button-outline property-request-button" href="/register/tenant">Create a tenant demo account to request</a>;
+                  } else if (apartment && account?.role !== 'tenant') {
+                    action = <a className="button button-outline property-request-button" href="/login">Sign in as a tenant to request</a>;
+                  }
+                  return <PropertyCard key={listing.id} listing={listing} action={action} />;
+                })}
               </div>
             ) : (
               <div className="empty-state">
@@ -469,16 +509,22 @@ function App() {
   if (path === '/') return <HomePage />;
   if (path === '/properties') return <ListingsPage />;
   if (path === '/login' || path === '/signin') return <AuthPage route="login" />;
+  if (path === '/register') return <AuthPage route="choose-role" />;
   if (path === '/register/landlord') return <AuthPage route="register-landlord" />;
   if (path === '/register/agent') return <AuthPage route="register-agent" />;
+  if (path === '/register/tenant') return <AuthPage route="register-tenant" />;
+  if (path === '/tenant/dashboard') return <DashboardPage role="tenant" />;
   if (path === '/forgot-password') return <AuthPage route="forgot-password" />;
   if (path === '/privacy') return <AuthPage route="privacy" />;
   if (path === '/terms') return <AuthPage route="terms" />;
-  if (path === '/landlord/dashboard') return <ProtectedDashboardPage role="landlord" />;
-  if (path === '/agent/dashboard') return <ProtectedDashboardPage role="agent" />;
+  if (path === '/landlord/dashboard') return <DashboardPage role="landlord" />;
+  if (path === '/agent/dashboard') return <DashboardPage role="agent" />;
   const detailMatch = path.match(/^\/properties\/([^/]+)$/);
   if (detailMatch) {
-    const listing = listings.find((item) => item.id === decodeURIComponent(detailMatch[1]));
+    const dynamicListings = readDemoState().apartments
+      .filter((apartment) => apartment.occupantId === null)
+      .map(demoApartmentListing);
+    const listing = [...listings, ...dynamicListings].find((item) => item.id === decodeURIComponent(detailMatch[1]));
     return listing ? <PropertyDetailPage listing={listing} /> : <NotFoundPage />;
   }
   return <NotFoundPage />;

@@ -1,16 +1,7 @@
 # DwellSafe Backend
 
-This backend provides the platform API for the DwellSafe housing marketplace.
+NestJS + TypeScript backend using the Express adapter, PostgreSQL, and Prisma.
 
-## Available endpoints
+The current API consists of `GET /api/health`, `GET /api/listings`, and `GET /api/verification-status`. Listings and verification counts are explicitly identified demo fixtures; no demo data is inserted into PostgreSQL.
 
-- `GET /api/health`
-- `GET /api/listings`
-- `GET /api/verification-status`
-
-## Run locally
-
-```bash
-npm install
-npm run dev
-```
+See [Backend Setup](../docs/implementation/BACKEND_SETUP.md), [Backend Architecture](../docs/implementation/BACKEND_ARCHITECTURE.md), [Database Schema](../docs/implementation/DATABASE_SCHEMA.md), and [API Specification](../docs/implementation/API_SPECIFICATION.md) for configuration, migrations, route contracts, and security limitations.
