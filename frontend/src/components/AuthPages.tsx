@@ -81,7 +81,7 @@ function LegalInfoPage({ route }: { route: 'privacy' | 'terms' }) {
         <h1>{isPrivacy ? 'Privacy notice' : 'Terms of service'}</h1>
         <div className="form-alert form-alert-warning" role="status">This product is an early demo. A complete legal policy has not been published yet.</div>
         <p>{isPrivacy
-          ? 'This prototype stores demo account profiles, apartment details, and requests in your browser local storage. Passwords are not stored, and the email-only demo sign-in does not verify identity. Do not enter real personal information. Clearing browser storage removes demo data.'
+          ? 'This prototype stores demo account profiles, apartment details, requests, agent relationships, rating scores, and identity document categories in your browser local storage. Selected identity files are not uploaded or saved, and ID numbers are not collected. Passwords are not stored, and the email-only demo sign-in does not verify identity. Do not enter real personal information or select real identity documents. Clearing browser storage removes demo data.'
           : 'This demo contains fictional sample listings and browser-only demo accounts and apartment records. It does not provide secure authentication, real rental offers, or verification services.'}</p>
         <p>For questions, contact <a href="mailto:support@dwellsafe.ng">support@dwellsafe.ng</a>.</p>
         <a className="text-link" href="/">Return to DwellSafe <span aria-hidden="true">→</span></a>

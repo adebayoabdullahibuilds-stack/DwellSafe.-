@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { AuthLayout, PasswordField, type RegistrationRole } from './AuthShared';
-import { createDemoAccount } from '../data/demoStore';
+import { createDemoAccount, readDemoState } from '../data/demoStore';
 
 export function RegisterPage({ role }: { role: RegistrationRole }) {
   const isLandlord = role === 'landlord';
@@ -10,6 +10,10 @@ export function RegisterPage({ role }: { role: RegistrationRole }) {
   const [passwordError, setPasswordError] = useState('');
   const [confirmError, setConfirmError] = useState('');
   const [submitMessage, setSubmitMessage] = useState('');
+  const [onboardingMethod, setOnboardingMethod] = useState<'self' | 'landlord'>('self');
+  const landlords = isAgent
+    ? readDemoState().accounts.filter((account) => account.role === 'landlord')
+    : [];
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,12 +35,20 @@ export function RegisterPage({ role }: { role: RegistrationRole }) {
     }
 
     const formData = new FormData(form);
+    const verifyingLandlordId = String(formData.get('verifyingLandlordId') ?? '') || null;
+    if (isAgent && onboardingMethod === 'landlord' && !verifyingLandlordId) {
+      setSubmitMessage('Choose a landlord in this browser to verify your agent onboarding, or select self-onboarding.');
+      return;
+    }
     try {
       createDemoAccount({
         role,
         name: String(formData.get('name') ?? '').trim(),
         email: String(formData.get('email') ?? '').trim(),
         phone: String(formData.get('phone') ?? '').trim(),
+        agentOnboardingMethod: isAgent ? onboardingMethod : null,
+        agentOnboardingStatus: isAgent ? 'pending' : null,
+        verifyingLandlordId: isAgent && onboardingMethod === 'landlord' ? verifyingLandlordId : null,
       });
       window.location.assign(role === 'tenant' ? '/tenant/dashboard' : `/${role}/dashboard`);
     } catch (error) {
@@ -106,6 +118,28 @@ export function RegisterPage({ role }: { role: RegistrationRole }) {
                   <input id="operation-areas" name="operationAreas" placeholder="e.g. Yaba, Ikeja, Lekki" required />
                   <span className="field-hint">Separate multiple locations with commas.</span>
                 </div>
+                <div className="auth-field">
+                  <label htmlFor="agent-onboarding">Agent onboarding route</label>
+                  <select
+                    id="agent-onboarding"
+                    name="onboardingMethod"
+                    value={onboardingMethod}
+                    onChange={(event) => setOnboardingMethod(event.target.value as 'self' | 'landlord')}
+                  >
+                    <option value="self">Onboard myself (pending review)</option>
+                    <option value="landlord" disabled={landlords.length === 0}>Request landlord verification</option>
+                  </select>
+                  <span className="field-hint">Agent profiles stay pending until reviewed. This demo does not perform a real identity check.</span>
+                </div>
+                {onboardingMethod === 'landlord' && (
+                  <div className="auth-field">
+                    <label htmlFor="verifying-landlord">Landlord verifier <span aria-hidden="true">*</span></label>
+                    <select id="verifying-landlord" name="verifyingLandlordId" defaultValue="" required>
+                      <option value="" disabled>Select a landlord account</option>
+                      {landlords.map((landlord) => <option key={landlord.id} value={landlord.id}>{landlord.name} · {landlord.email}</option>)}
+                    </select>
+                  </div>
+                )}
               </>
             ) : null}
 

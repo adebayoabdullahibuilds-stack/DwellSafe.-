@@ -25,11 +25,13 @@ DwellSafe is an early-stage housing marketplace prototype focused on helping peo
 
 ### Tenant and landlord workflows
 
-- Landlord dashboard to add apartments, see their apartment portfolio and occupants, and review tenant requests.
-- Tenant dashboard to view an assigned apartment and request statuses.
+- Landlord dashboard to add apartments, assign verified demo agents, see occupants, review tenant requests, and review agent onboarding.
+- Tenant dashboard to view an assigned apartment, request statuses, and the landlord-agent-tenant connection chain.
 - Tenants can request landlord-created apartments from the property search results.
 - Landlords can accept or decline requests. Accepting a request assigns the tenant as the apartment's occupant.
 - Tenant search can filter both fictional sample listings and demo apartments by category, location, and rent.
+- Agents can self-onboard or request a named landlord's relationship verification, view assigned properties and tenant connections, and receive ratings from tenants with accepted requests.
+- Tenants, landlords, and agents share a demo identity-verification flow for NIN, voter-card, or driver's-license document categories. It records only the category and a pending status; it does not transmit or store selected files or collect ID numbers.
 
 ### Backend
 
@@ -43,7 +45,7 @@ The API listings are fictional demonstration data from a dedicated provider. The
 
 ## Demo storage and safety limitations
 
-Demo account profiles, landlord-created apartments, requests, and occupancy assignments are saved in the current browser's `localStorage`. They are not shared across browsers or devices, sent to the backend, or protected by server authentication. Clearing the browser's site data removes them.
+Demo account profiles, landlord-created apartments, agent assignments, requests, ratings, onboarding decisions, and identity document categories are saved in the current browser's `localStorage`. They are not shared across browsers or devices, sent to the backend, or protected by server authentication. The identity document picker is a UI simulation: selected files stay in the browser and are discarded without upload or persistence. Clearing the browser's site data removes demo data.
 
 Do not use the prototype for real accounts, personal information, property records, tenant screening, payments, or verification decisions. Demo listings and account states do not establish that a real home is available or verified.
 
@@ -52,8 +54,8 @@ Do not use the prototype for real accounts, personal information, property recor
 - Applying migrations against a running PostgreSQL instance remains environment-dependent.
 - Production authentication, password verification, secure sessions, and role-based server authorization.
 - Database persistence and APIs for accounts, apartments, occupancy, and tenant requests.
-- A functional agent dashboard or agent-to-landlord/property workflows.
-- Verification review, moderation, notifications, and password recovery email delivery.
+- Production identity document upload/storage, verification review, moderation, notifications, and password recovery email delivery.
+- Server-persisted agent-to-landlord/property workflows, enforceable agent ratings, and account authorization.
 - Production privacy and terms policies.
 
 Before any real-world use, implement and test the backend services, persistent storage, server-enforced authorization, security controls, privacy practices, and operational workflows.

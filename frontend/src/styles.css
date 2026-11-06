@@ -483,6 +483,15 @@ h1, h2, h3, p { margin-top: 0; }
 .dashboard-form textarea { resize: vertical; }
 .dashboard-form-wide { grid-column: 1 / -1; }
 .dashboard-form > .button { justify-self: start; }
+.identity-form { margin-top: 16px; }
+.identity-form > .button { justify-self: start; }
+.dashboard-section > .field-hint { display: block; margin-top: 12px; }
+.agent-assignment { margin-top: 14px; display: grid; gap: 6px; color: #526357; font-size: .77rem; font-weight: 700; }
+.agent-assignment select, .agent-rating-form select { min-height: 40px; padding: 8px 10px; border: 1px solid #d6dfd8; border-radius: 5px; background: #fff; color: #24352b; font: inherit; font-size: .8rem; }
+.dashboard-request-stacked { flex-wrap: wrap; }
+.dashboard-request-stacked > div:first-child { flex: 1 1 260px; }
+.agent-rating-form { display: flex; align-items: end; gap: 9px; }
+.agent-rating-form label { display: grid; gap: 5px; color: #526357; font-size: .75rem; font-weight: 700; }
 .property-request-button { width: 100%; margin-top: 10px; font-size: .75rem; }
 
 @media (max-width: 980px) {
