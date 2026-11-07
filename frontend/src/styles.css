@@ -198,7 +198,7 @@ h1, h2, h3, p { margin-top: 0; }
   box-shadow: 0 9px 24px rgba(27, 47, 36, 0.08);
 }
 
-.home-search { display: grid; grid-template-columns: 1.25fr 1fr 1fr auto; align-items: end; gap: 10px; }
+.home-search { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; align-items: end; gap: 10px; }
 .search-field, .filter-field { display: grid; gap: 8px; min-width: 0; }
 .search-field { padding: 0 12px; }
 .search-field span, .filter-field > span { color: #526057; font-size: 0.75rem; font-weight: 700; }
@@ -271,6 +271,9 @@ h1, h2, h3, p { margin-top: 0; }
 .property-price { margin: 0; color: #203d2d; font-family: 'Manrope', sans-serif; font-size: 1.05rem; font-weight: 800; letter-spacing: -.04em; }
 .property-price > span { color: #77827a; font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 500; letter-spacing: 0; }
 .property-card-bottom .text-link { font-size: .75rem; }
+.property-contact-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.property-contact-actions .button { min-height: 38px; padding: 0 11px; font-size: .74rem; }
+.detail-facts .property-contact-actions .button { flex: 1 1 150px; }
 
 .verification-section { background: #f5f7f4; }
 .verification-inner { width: min(1060px, calc(100% - 64px)); margin: 0 auto; padding: 78px 0 50px; display: grid; grid-template-columns: .87fr 1.13fr; gap: 48px 80px; }

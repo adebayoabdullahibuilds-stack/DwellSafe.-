@@ -6,7 +6,7 @@ This frontend provides a responsive marketplace interface for property discovery
 
 - `/` — homepage with a search form, popular locations, featured sample homes, and an explanation of verification.
 - `/properties` — searchable and filterable sample listings. Search values are read from URL query parameters such as `location`, `type`, `minRent`, and `maxRent`.
-- `/properties/:id` — details for a sample property.
+- `/properties/:id` — shareable property detail links.
 - `/register` — choose a tenant or landlord account type.
 - `/register/tenant`, `/register/landlord`, and `/register/agent` — role-specific demo registration forms.
 - `/login` and `/forgot-password` — authentication UI states.
@@ -15,6 +15,8 @@ This frontend provides a responsive marketplace interface for property discovery
 - `/agent/dashboard` — agent dashboard placeholder.
 
 The listings in `src/data/listings.ts` are fictional demonstration data. They are labelled as demo listings and pending verification; none are represented as genuinely verified or available properties.
+
+Property cards and detail pages can share a direct DwellSafe listing link through WhatsApp. Landlord-created demo listings also offer agent inquiry through the assigned agent's saved phone number when it uses an international format or a Nigerian number starting with `0`. To provide a WhatsApp inquiry-group invite as a fallback, set `VITE_DWELLSAFE_WHATSAPP_GROUP_URL` to its `https://chat.whatsapp.com/...` invite URL. No group link is configured by default. WhatsApp sharing lets the user choose a conversation or group; it does not post messages automatically.
 
 ## Demo account and data status
 
