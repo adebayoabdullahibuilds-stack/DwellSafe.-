@@ -14,8 +14,8 @@ for the transparent brand mark and PDF page 4 for the browser-tab favicon.
 These are individual PDF image objects, not crops or redraws. Shared header and
 authentication branding now use the mark via a reusable, typed component; the
 browser favicon points to the dedicated PDF icon. These assets have been
-visually inspected after extraction. Live browser rendering has not yet been
-checked.
+visually inspected after extraction and checked in the refreshed browser at
+mobile width.
 
 ## Asset inventory
 
@@ -110,8 +110,8 @@ The transparent mark is implemented in the shared site and authentication
 header through `BrandLink` and the typed `BrandIconId` in
 `frontend/src/components/Brand.tsx`. The browser favicon is implemented via
 `frontend/index.html`. Both assets were visually inspected against the
-embedded PDF artwork after extraction. Live browser rendering and
-small-screen display remain to be verified.
+embedded PDF artwork after extraction. The refreshed site and registration
+page were visually checked at a 390 px viewport width.
 
 Obtain individual approved exports (preferably SVGs) for the wordmark, app
 icon, PWA icon, full light/dark variants, and any verification badges. Confirm
