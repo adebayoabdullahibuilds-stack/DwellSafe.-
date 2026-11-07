@@ -9,9 +9,13 @@ individual production icon exports were found. The PDF provides a visual
 system and size guidance, but not editable SVG source markup or explicit
 numeric color tokens.
 
-No application pages or branding components were changed. The rendered
-application was not compared because this task was limited to the requested
-asset audit and registry; no asset is marked implemented.
+The approved embedded raster artwork was extracted directly from PDF page 3
+for the transparent brand mark and PDF page 4 for the browser-tab favicon.
+These are individual PDF image objects, not crops or redraws. Shared header and
+authentication branding now use the mark via a reusable, typed component; the
+browser favicon points to the dedicated PDF icon. These assets have been
+visually inspected after extraction. Live browser rendering has not yet been
+checked.
 
 ## Asset inventory
 
@@ -19,10 +23,13 @@ asset audit and registry; no asset is marked implemented.
 |---|---|---|---|---|---|---|---|
 | `DwellSafe icon system.pdf` (repository root) | Authoritative digital icon-system specification | A home/safety mark with verification integrated into the form; the document describes home, trust, connection, and clarity | Use as the visual authority for later icon exports and implementation; the PDF itself is a reference, not a production icon | Page 6 shows navy, green, white, and neutral-on-light/dark-background treatments; page 4 shows light/dark-context examples | 7 pages; each page 1440 × 810 pt | PDF 1.4, Canva export | Reference only; no direct frontend destination |
 | `frontend/image.png` | Composite brand concept sheet | Labeled concept explorations, logo/icon/badge examples, palette, typography, and application examples | Reference only; do not use the contact sheet as a logo, favicon, or icon | Shows several concepts and examples that do not consistently match the supplied PDF's final icon | 1080 × 720 px | PNG | None; reference only |
-| `frontend/public/dwellsafe-brand.png` | Duplicate composite brand concept sheet | Same image as `frontend/image.png` | Not approved as a standalone brand mark; current use conflicts with the file's contact-sheet content | Identical to `frontend/image.png`; no independent variant | 1080 × 720 px | PNG | Currently referenced by `App.tsx` and `AuthShared.tsx` as the brand image; replace only when approved standalone exports are available |
-| `frontend/public/favicon.png` | Duplicate composite brand concept sheet | Same image as `frontend/image.png` | Not approved as a favicon; current use conflicts with the file's contact-sheet content | Identical to `frontend/image.png`; no independent variant | 1080 × 720 px | PNG | Currently referenced by `frontend/index.html`; replace only when approved favicon exports are available |
+| `frontend/public/dwellsafe-brand.png` | Transparent standalone brand mark | PDF page 3's standalone green home/check mark | Shared site and authentication header mark on the light interface | Green mark on transparent background; source context is the PDF's 24 × 24 px notification/small-icon variant | 60 × 60 px embedded PDF image (`img_p2_9`) | PNG, extracted directly from PDF | Referenced through `brandAssetPaths.mark` in `frontend/src/components/Brand.tsx` |
+| `frontend/public/favicon.png` | Browser favicon | PDF page 4's small browser-tab mark | Browser tab/favicon; the PDF illustrates favicon artwork at 16 px and 32 px | Navy rounded tile with green mark, transparent outside the tile | 61 × 60 px embedded PDF image (`img_p3_9`) | PNG, extracted directly from PDF | Referenced by `frontend/index.html` |
 
-The three PNGs have matching SHA-256 hashes and are byte-identical.
+Before extraction, the three existing frontend PNG files were byte-identical
+1080 × 720 px contact sheets. The public brand and favicon files have now been
+replaced with the distinct individual artwork objects from the PDF; the
+contact sheet remains at `frontend/image.png` as a reference.
 
 ## PDF icon and visual specifications
 
@@ -55,8 +62,9 @@ properties, landlords, or agents.
 Page 4 explicitly discusses favicon/icon clarity at 16 px and 32 px and
 attributes small-size legibility to simplified geometry, balanced stroke
 weight, and generous negative space. It shows app, favicon, and browser-tab
-examples on light and dark backgrounds. No downloadable, individually
-exported files for these variants are included in the audited workspace.
+examples on light and dark backgrounds. No downloadable SVGs or individual
+files at these exact pixel dimensions were included; the two implemented
+PNGs are the individual image objects embedded in the PDF.
 
 ### Background treatments and color
 
@@ -78,10 +86,10 @@ verified PDF tokens.
 ## Missing assets and conflicting specifications
 
 - The requested `design-source/` directory is absent.
-- The PDF is a visual specification; no standalone vector source was found.
-  SVG `viewBox`, dimensions, fills, and strokes therefore cannot be recorded.
-- No separate production files were found for the primary/stacked wordmark,
-  icon sizes, favicon, PWA icon, or background variants.
+- No standalone vector source was found. SVG `viewBox`, dimensions, fills, and
+  strokes therefore cannot be recorded.
+- No isolated production wordmark, mobile app export, PWA export, or complete
+  set of light/dark icon variants was found.
 - The frontend PNG contact sheet shows a different selected logo concept and
   additional labels (including “Verified Property,” “Verified Landlord,” and
   “Verified Agent,” plus Poppins and hex palette values) not established by
@@ -93,13 +101,20 @@ verified PDF tokens.
   navigation examples in a mockup, but does not define a standalone,
   production-ready verification badge or a complete set of verification-state
   icons.
+- The source wordmark is shown in PDF mockups but is not supplied as an
+  isolated, reusable asset. Existing text wordmark styling remains in use.
 
-## Implementation gate
+## Implementation status
 
-Obtain individual approved exports (preferably SVGs) for the wordmark, icon
-variants, favicon/PWA sizes, and any verification badges. Confirm whether the
-PDF supersedes the older/different PNG contact sheet and request numeric
-palette, clear-space, badge, and wordmark-size specifications. Implement only
-after those assets are available, then compare the rendered light/dark and
-small-screen variants against the inspected PDF. The composite PNG files are
-not approved substitutes for those exports.
+The transparent mark is implemented in the shared site and authentication
+header through `BrandLink` and the typed `BrandIconId` in
+`frontend/src/components/Brand.tsx`. The browser favicon is implemented via
+`frontend/index.html`. Both assets were visually inspected against the
+embedded PDF artwork after extraction. Live browser rendering and
+small-screen display remain to be verified.
+
+Obtain individual approved exports (preferably SVGs) for the wordmark, app
+icon, PWA icon, full light/dark variants, and any verification badges. Confirm
+whether the PDF supersedes the older/different PNG contact sheet and request
+numeric palette, clear-space, badge, and wordmark-size specifications. Do not
+substitute or crop the composite PNG sheet for those exports.

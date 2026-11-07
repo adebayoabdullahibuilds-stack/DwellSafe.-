@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { BrandLink } from './Brand';
 
 export type RegistrationRole = 'tenant' | 'landlord' | 'agent';
 
@@ -6,10 +7,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="auth-page">
       <header className="auth-header">
-        <a className="brand" href="/" aria-label="DwellSafe home">
-          <img src="/dwellsafe-brand.png" alt="" />
-          <span className="brand-name">Dwell<span>Safe</span></span>
-        </a>
+        <BrandLink />
         <a href="/properties">Explore properties <span aria-hidden="true">→</span></a>
       </header>
       {children}

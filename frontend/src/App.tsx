@@ -8,6 +8,7 @@ import {
   type DemoState,
 } from './data/demoStore';
 import { DashboardPage } from './components/Dashboard';
+import { BrandLink } from './components/Brand';
 import {
   AuthPage,
   type AuthRoute,
@@ -66,22 +67,13 @@ function formatNaira(amount: number) {
   }).format(amount);
 }
 
-function Logo() {
-  return (
-    <a className="brand" href="/" aria-label="DwellSafe home">
-      <img src="/dwellsafe-brand.png" alt="" />
-      <span className="brand-name">Dwell<span>Safe</span></span>
-    </a>
-  );
-}
-
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Logo />
+        <BrandLink />
         <button
           className="mobile-menu-button"
           type="button"
@@ -117,7 +109,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <Logo />
+          <BrandLink />
           <p>Clearer property information for renters, landlords, and agents across Nigeria.</p>
         </div>
         <div className="footer-links-group">
