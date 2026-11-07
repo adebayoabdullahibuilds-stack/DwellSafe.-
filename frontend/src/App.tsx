@@ -9,6 +9,7 @@ import {
 } from './data/demoStore';
 import { DashboardPage } from './components/Dashboard';
 import { BrandLink } from './components/Brand';
+import { ThemeProvider, ThemeToggle } from './components/Theme';
 import {
   AuthPage,
   type AuthRoute,
@@ -91,11 +92,13 @@ function Header() {
           <a href="/#for-landlords" onClick={() => setMenuOpen(false)}>For landlords</a>
           <a href="/#for-agents" onClick={() => setMenuOpen(false)}>For agents</a>
           <div className="mobile-nav-actions">
+            <ThemeToggle />
             <a className="button button-outline" href="/login">Sign in</a>
             <a className="button button-primary" href="/register">Get started</a>
           </div>
         </nav>
         <div className="header-actions">
+          <ThemeToggle />
           <a className="sign-in-link" href="/login">Sign in</a>
           <a className="button button-primary header-cta" href="/register">Get started</a>
         </div>
@@ -496,7 +499,7 @@ function NotFoundPage() {
   return <><Header /><main className="not-found section-wrap"><p className="eyebrow">Page not found</p><h1>We couldn't find that page.</h1><a className="button button-primary" href="/">Back to DwellSafe</a></main><Footer /></>;
 }
 
-function App() {
+function AppContent() {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
   if (path === '/') return <HomePage />;
   if (path === '/properties') return <ListingsPage />;
@@ -520,6 +523,14 @@ function App() {
     return listing ? <PropertyDetailPage listing={listing} /> : <NotFoundPage />;
   }
   return <NotFoundPage />;
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
 }
 
 export default App;

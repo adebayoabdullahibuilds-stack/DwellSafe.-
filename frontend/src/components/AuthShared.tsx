@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { BrandLink } from './Brand';
+import { ThemeToggle } from './Theme';
 
 export type RegistrationRole = 'tenant' | 'landlord' | 'agent';
 
@@ -8,7 +9,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
     <div className="auth-page">
       <header className="auth-header">
         <BrandLink />
-        <a href="/properties">Explore properties <span aria-hidden="true">→</span></a>
+        <div className="auth-header-actions">
+          <ThemeToggle />
+          <a href="/properties">Explore properties <span aria-hidden="true">→</span></a>
+        </div>
       </header>
       {children}
       <footer className="auth-footer">
