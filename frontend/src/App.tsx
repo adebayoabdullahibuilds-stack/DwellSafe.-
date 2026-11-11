@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { listings, type PropertyListing } from './data/listings';
+import { listings, supportedStates, type PropertyListing } from './data/listings';
 import {
   activeDemoAccount,
   demoApartmentListing,
@@ -8,6 +8,8 @@ import {
   type DemoState,
 } from './data/demoStore';
 import { DashboardPage } from './components/Dashboard';
+import { BrandLink } from './components/Brand';
+import { ThemeProvider, ThemeToggle } from './components/Theme';
 import {
   AuthPage,
   type AuthRoute,
@@ -15,6 +17,7 @@ import {
 
 type Filters = {
   search: string;
+  state: string;
   location: string;
   propertyType: string;
   minRent: string;
@@ -24,6 +27,7 @@ type Filters = {
 
 const emptyFilters: Filters = {
   search: '',
+  state: '',
   location: '',
   propertyType: '',
   minRent: '',
@@ -31,13 +35,14 @@ const emptyFilters: Filters = {
   sort: 'relevance',
 };
 
-const locations = ['Lekki', 'Yaba', 'Ikeja', 'Surulere', 'Abuja', 'Ibadan'];
+const locations = ['Lekki', 'Yaba', 'Ikeja', 'Surulere', 'Abuja', 'Ibadan', 'Abeokuta', 'Osogbo', 'Akure', 'Ado-Ekiti'];
 const propertyTypes = ['Self-contained', 'Mini flat', '2-bedroom flat', '3-bedroom flat', 'Duplex'];
 
 function readFiltersFromUrl(): Filters {
   const params = new URLSearchParams(window.location.search);
   return {
     search: params.get('search') ?? '',
+    state: params.get('state') ?? '',
     location: params.get('location') ?? '',
     propertyType: params.get('type') ?? '',
     minRent: params.get('minRent') ?? '',
@@ -49,6 +54,7 @@ function readFiltersFromUrl(): Filters {
 function updateUrl(filters: Filters) {
   const params = new URLSearchParams();
   if (filters.search) params.set('search', filters.search);
+  if (filters.state) params.set('state', filters.state);
   if (filters.location) params.set('location', filters.location);
   if (filters.propertyType) params.set('type', filters.propertyType);
   if (filters.minRent) params.set('minRent', filters.minRent);
@@ -66,22 +72,13 @@ function formatNaira(amount: number) {
   }).format(amount);
 }
 
-function Logo() {
-  return (
-    <a className="brand" href="/" aria-label="DwellSafe home">
-      <img src="/dwellsafe-brand.png" alt="" />
-      <span className="brand-name">Dwell<span>Safe</span></span>
-    </a>
-  );
-}
-
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Logo />
+        <BrandLink />
         <button
           className="mobile-menu-button"
           type="button"
@@ -99,11 +96,13 @@ function Header() {
           <a href="/#for-landlords" onClick={() => setMenuOpen(false)}>For landlords</a>
           <a href="/#for-agents" onClick={() => setMenuOpen(false)}>For agents</a>
           <div className="mobile-nav-actions">
+            <ThemeToggle />
             <a className="button button-outline" href="/login">Sign in</a>
             <a className="button button-primary" href="/register">Get started</a>
           </div>
         </nav>
         <div className="header-actions">
+          <ThemeToggle />
           <a className="sign-in-link" href="/login">Sign in</a>
           <a className="button button-primary header-cta" href="/register">Get started</a>
         </div>
@@ -117,7 +116,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <Logo />
+          <BrandLink />
           <p>Clearer property information for renters, landlords, and agents across Nigeria.</p>
         </div>
         <div className="footer-links-group">
@@ -147,7 +146,46 @@ function DemoBadge() {
   return <span className="demo-badge"><span aria-hidden="true">●</span> Demo listing</span>;
 }
 
-function PropertyCard({ listing, action }: { listing: PropertyListing; action?: React.ReactNode }) {
+function getWhatsAppNumber(phone: string | undefined) {
+  if (!phone) return null;
+  const trimmed = phone.trim();
+  const digits = trimmed.replace(/\D/g, '');
+  if (!digits) return null;
+  if (digits.startsWith('0')) return `234${digits.slice(1)}`;
+  if (digits.startsWith('234') || trimmed.startsWith('+')) return digits;
+  return null;
+}
+
+function PropertyActions({ listing, agentPhone }: { listing: PropertyListing; agentPhone?: string }) {
+  const listingUrl = new URL(`/properties/${encodeURIComponent(listing.id)}`, window.location.origin).toString();
+  const shareText = `View this DwellSafe listing: ${listing.title} — ${listingUrl}`;
+  const shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const agentNumber = getWhatsAppNumber(agentPhone);
+  const inquiryUrl = agentNumber
+    ? `https://wa.me/${agentNumber}?text=${encodeURIComponent(`Hi, I'm enquiring about ${listing.title}: ${listingUrl}`)}`
+    : null;
+  const groupUrl = import.meta.env.VITE_DWELLSAFE_WHATSAPP_GROUP_URL?.trim();
+  const validGroupUrl = groupUrl?.startsWith('https://chat.whatsapp.com/') ? groupUrl : null;
+
+  return (
+    <div className="property-contact-actions">
+      <a className="button button-outline" href={shareUrl} target="_blank" rel="noopener noreferrer">
+        Share on WhatsApp
+      </a>
+      {inquiryUrl ? (
+        <a className="button button-primary" href={inquiryUrl} target="_blank" rel="noopener noreferrer">
+          Ask agent on WhatsApp
+        </a>
+      ) : validGroupUrl ? (
+        <a className="button button-primary" href={validGroupUrl} target="_blank" rel="noopener noreferrer">
+          WhatsApp inquiry group
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+function PropertyCard({ listing, action, agentPhone }: { listing: PropertyListing; action?: React.ReactNode; agentPhone?: string }) {
   return (
     <article className="property-card">
       <a className="property-image-link" href={`/properties/${listing.id}`} aria-label={`View ${listing.title}`}>
@@ -173,6 +211,7 @@ function PropertyCard({ listing, action }: { listing: PropertyListing; action?: 
           <p className="property-price">{formatNaira(listing.rent)} <span>/ year</span></p>
           <a className="text-link" href={`/properties/${listing.id}`}>View details <span aria-hidden="true">→</span></a>
         </div>
+        <PropertyActions listing={listing} agentPhone={agentPhone} />
         {action}
       </div>
     </article>
@@ -183,7 +222,14 @@ function SearchForm() {
   return (
     <form className="home-search" action="/properties" method="get">
       <label className="search-field search-location">
-        <span>Where do you want to live?</span>
+        <span>State</span>
+        <select name="state" defaultValue="">
+          <option value="">All states</option>
+          {supportedStates.map((state) => <option key={state} value={state}>{state}</option>)}
+        </select>
+      </label>
+      <label className="search-field">
+        <span>City or area</span>
         <select name="location" defaultValue="">
           <option value="">All locations</option>
           {locations.map((item) => <option key={item} value={item}>{item}</option>)}
@@ -240,14 +286,14 @@ function HomePage() {
 
         <section className="popular-section section-wrap">
           <div className="section-heading compact-heading">
-            <div><p className="eyebrow">Start somewhere familiar</p><h2>Popular places to call home</h2></div>
+            <div><p className="eyebrow">Find homes by state</p><h2>Explore available locations</h2></div>
             <a className="text-link" href="/properties">Explore all locations <span aria-hidden="true">→</span></a>
           </div>
           <div className="location-list">
-            {locations.map((place, index) => (
-              <a className="location-chip" key={place} href={`/properties?location=${encodeURIComponent(place)}`}>
-                <span className={`location-mark location-mark-${index}`} aria-hidden="true">{place.slice(0, 1)}</span>
-                <span>{place}</span>
+            {supportedStates.map((state, index) => (
+              <a className="location-chip" key={state} href={`/properties?state=${encodeURIComponent(state)}`}>
+                <span className={`location-mark location-mark-${index}`} aria-hidden="true">{state.slice(0, 1)}</span>
+                <span>{state}</span>
                 <span className="location-arrow" aria-hidden="true">↗</span>
               </a>
             ))}
@@ -358,11 +404,12 @@ function ListingsPage() {
     const searchTerm = filters.search.trim().toLowerCase();
     const results = availableListings.filter((listing) => {
       const matchesSearch = !searchTerm || `${listing.title} ${listing.location} ${listing.neighborhood} ${listing.state} ${listing.propertyType}`.toLowerCase().includes(searchTerm);
+      const matchesState = !filters.state || listing.state.toLowerCase() === filters.state.toLowerCase();
       const matchesLocation = !filters.location || listing.location.toLowerCase() === filters.location.toLowerCase();
       const matchesType = !filters.propertyType || listing.propertyType === filters.propertyType;
       const minRent = filters.minRent ? Number(filters.minRent) : 0;
       const maxRent = filters.maxRent ? Number(filters.maxRent) : Number.POSITIVE_INFINITY;
-      return matchesSearch && matchesLocation && matchesType && listing.rent >= minRent && listing.rent <= maxRent;
+      return matchesSearch && matchesState && matchesLocation && matchesType && listing.rent >= minRent && listing.rent <= maxRent;
     });
 
     if (filters.sort === 'price-low') return results.sort((a, b) => a.rent - b.rent);
@@ -398,6 +445,13 @@ function ListingsPage() {
               <input type="search" placeholder="Area, city or keyword" value={filters.search} onChange={(event) => setFilter('search', event.target.value)} />
             </label>
             <label className="filter-field">
+              <span>State</span>
+              <select value={filters.state} onChange={(event) => setFilter('state', event.target.value)}>
+                <option value="">All states</option>
+                {[...new Set([...supportedStates, ...availableListings.map((listing) => listing.state)])].map((state) => <option key={state} value={state}>{state}</option>)}
+              </select>
+            </label>
+            <label className="filter-field">
               <span>Location</span>
               <select value={filters.location} onChange={(event) => setFilter('location', event.target.value)}>
                 <option value="">All locations</option>
@@ -428,6 +482,9 @@ function ListingsPage() {
               <div className="property-grid">
                 {filteredListings.map((listing) => {
                   const apartment = landlordApartments.find((saved) => saved.id === listing.id);
+                  const agentPhone = apartment?.agentId
+                    ? demoState.accounts.find((person) => person.id === apartment.agentId)?.phone
+                    : undefined;
                   const previousRequest = apartment && account
                     ? demoState.requests.find((request) => request.apartmentId === apartment.id && request.tenantId === account.id)
                     : undefined;
@@ -451,7 +508,7 @@ function ListingsPage() {
                   } else if (apartment && account?.role !== 'tenant') {
                     action = <a className="button button-outline property-request-button" href="/login">Sign in as a tenant to request</a>;
                   }
-                  return <PropertyCard key={listing.id} listing={listing} action={action} />;
+                  return <PropertyCard key={listing.id} listing={listing} action={action} agentPhone={agentPhone} />;
                 })}
               </div>
             ) : (
@@ -470,7 +527,7 @@ function ListingsPage() {
   );
 }
 
-function PropertyDetailPage({ listing }: { listing: PropertyListing }) {
+function PropertyDetailPage({ listing, agentPhone }: { listing: PropertyListing; agentPhone?: string }) {
   return (
     <>
       <Header />
@@ -491,6 +548,7 @@ function PropertyDetailPage({ listing }: { listing: PropertyListing }) {
             <p className="property-price">{formatNaira(listing.rent)} <span>/ year</span></p>
             <p>{listing.propertyType} · {listing.bedrooms} bedroom · {listing.bathrooms} bath</p>
             <p><strong>Sample listing only.</strong> This property and the agent details are fictional demonstration content.</p>
+            <PropertyActions listing={listing} agentPhone={agentPhone} />
             <p className="detail-safety">No verification has been completed. Do not treat this sample as a real listing or make payments based on demo information.</p>
           </aside>
         </div>
@@ -504,7 +562,7 @@ function NotFoundPage() {
   return <><Header /><main className="not-found section-wrap"><p className="eyebrow">Page not found</p><h1>We couldn't find that page.</h1><a className="button button-primary" href="/">Back to DwellSafe</a></main><Footer /></>;
 }
 
-function App() {
+function AppContent() {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
   if (path === '/') return <HomePage />;
   if (path === '/properties') return <ListingsPage />;
@@ -521,13 +579,26 @@ function App() {
   if (path === '/agent/dashboard') return <DashboardPage role="agent" />;
   const detailMatch = path.match(/^\/properties\/([^/]+)$/);
   if (detailMatch) {
-    const dynamicListings = readDemoState().apartments
-      .filter((apartment) => apartment.occupantId === null)
+    const demoState = readDemoState();
+    const dynamicApartments = demoState.apartments.filter((apartment) => apartment.occupantId === null);
+    const dynamicListings = dynamicApartments
       .map(demoApartmentListing);
     const listing = [...listings, ...dynamicListings].find((item) => item.id === decodeURIComponent(detailMatch[1]));
-    return listing ? <PropertyDetailPage listing={listing} /> : <NotFoundPage />;
+    const apartment = dynamicApartments.find((item) => item.id === listing?.id);
+    const agentPhone = apartment?.agentId
+      ? demoState.accounts.find((person) => person.id === apartment.agentId)?.phone
+      : undefined;
+    return listing ? <PropertyDetailPage listing={listing} agentPhone={agentPhone} /> : <NotFoundPage />;
   }
   return <NotFoundPage />;
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
 }
 
 export default App;

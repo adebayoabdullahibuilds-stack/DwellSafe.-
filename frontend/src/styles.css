@@ -198,7 +198,7 @@ h1, h2, h3, p { margin-top: 0; }
   box-shadow: 0 9px 24px rgba(27, 47, 36, 0.08);
 }
 
-.home-search { display: grid; grid-template-columns: 1.25fr 1fr 1fr auto; align-items: end; gap: 10px; }
+.home-search { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; align-items: end; gap: 10px; }
 .search-field, .filter-field { display: grid; gap: 8px; min-width: 0; }
 .search-field { padding: 0 12px; }
 .search-field span, .filter-field > span { color: #526057; font-size: 0.75rem; font-weight: 700; }
@@ -271,6 +271,9 @@ h1, h2, h3, p { margin-top: 0; }
 .property-price { margin: 0; color: #203d2d; font-family: 'Manrope', sans-serif; font-size: 1.05rem; font-weight: 800; letter-spacing: -.04em; }
 .property-price > span { color: #77827a; font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 500; letter-spacing: 0; }
 .property-card-bottom .text-link { font-size: .75rem; }
+.property-contact-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.property-contact-actions .button { min-height: 38px; padding: 0 11px; font-size: .74rem; }
+.detail-facts .property-contact-actions .button { flex: 1 1 150px; }
 
 .verification-section { background: #f5f7f4; }
 .verification-inner { width: min(1060px, calc(100% - 64px)); margin: 0 auto; padding: 78px 0 50px; display: grid; grid-template-columns: .87fr 1.13fr; gap: 48px 80px; }
@@ -619,4 +622,259 @@ h1, h2, h3, p { margin-top: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: .73rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.theme-toggle-track {
+  width: 30px;
+  height: 17px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #aab5ad;
+  transition: background-color 140ms ease;
+}
+
+.theme-toggle-track > span {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 140ms ease;
+}
+
+.theme-toggle[aria-checked="true"] .theme-toggle-track { background: var(--green); }
+.theme-toggle[aria-checked="true"] .theme-toggle-track > span { transform: translateX(13px); }
+.theme-toggle:hover { border-color: var(--green); }
+.auth-header-actions { display: flex; align-items: center; gap: 18px; }
+.auth-header-actions > a { color: var(--green); font-size: .83rem; font-weight: 700; }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #edf2ef;
+  background: #0d1b2a;
+  --ink: #edf2ef;
+  --muted: #aebbb4;
+  --line: #304337;
+  --paper: #0d1b2a;
+  --green-soft: #1c3328;
+  --green-readable: #91c9a6;
+}
+
+:root[data-theme="dark"] body { background: #0d1b2a; color: var(--ink); }
+:root[data-theme="dark"] .site-header,
+:root[data-theme="dark"] .main-nav,
+:root[data-theme="dark"] .search-section,
+:root[data-theme="dark"] .property-card,
+:root[data-theme="dark"] .filter-panel,
+:root[data-theme="dark"] .detail-facts,
+:root[data-theme="dark"] .auth-card,
+:root[data-theme="dark"] .next-steps,
+:root[data-theme="dark"] .dashboard-section { background: #13263a; }
+:root[data-theme="dark"] .site-header { border-color: #293c4d; }
+:root[data-theme="dark"] .hero-section,
+:root[data-theme="dark"] .verification-section,
+:root[data-theme="dark"] .site-footer,
+:root[data-theme="dark"] .auth-page { background: #0d1b2a; }
+:root[data-theme="dark"] .hero-photo { background: #1b2d3e; }
+:root[data-theme="dark"] .brand-name { color: #edf2ef; }
+:root[data-theme="dark"] .main-nav > a,
+:root[data-theme="dark"] .sign-in-link { color: #d3ddd7; }
+:root[data-theme="dark"] .mobile-menu-button { border-color: #344a3c; background: #13263a; }
+:root[data-theme="dark"] .mobile-menu-button span { background: #c8d7ce; }
+:root[data-theme="dark"] .main-nav > a { border-color: #293c4d; }
+:root[data-theme="dark"] .button-outline { border-color: #607466; background: #13263a; color: #e2ebe5; }
+:root[data-theme="dark"] .button-outline:hover { background: #1b3329; }
+:root[data-theme="dark"] .button-light { background: #fff; color: #104c38; }
+:root[data-theme="dark"] .hero-copy,
+:root[data-theme="dark"] .hero-assurance,
+:root[data-theme="dark"] .verification-copy > p:not(.eyebrow),
+:root[data-theme="dark"] .verification-step p,
+:root[data-theme="dark"] .verification-caveat,
+:root[data-theme="dark"] .trust-card > p:not(.eyebrow),
+:root[data-theme="dark"] .footer-brand > p,
+:root[data-theme="dark"] .footer-links-group,
+:root[data-theme="dark"] .footer-note,
+:root[data-theme="dark"] .listings-heading > div:first-child > p:last-child,
+:root[data-theme="dark"] .result-count,
+:root[data-theme="dark"] .results-toolbar > p,
+:root[data-theme="dark"] .sort-control,
+:root[data-theme="dark"] .detail-description,
+:root[data-theme="dark"] .detail-facts > p,
+:root[data-theme="dark"] .auth-intro > p:not(.eyebrow),
+:root[data-theme="dark"] .auth-benefits,
+:root[data-theme="dark"] .auth-card-heading > p:last-child,
+:root[data-theme="dark"] .auth-switch,
+:root[data-theme="dark"] .next-steps-note,
+:root[data-theme="dark"] .auth-footer,
+:root[data-theme="dark"] .auth-footer a,
+:root[data-theme="dark"] .no-session-note,
+:root[data-theme="dark"] .protected-notice > p:not(.eyebrow),
+:root[data-theme="dark"] .legal-page > p,
+:root[data-theme="dark"] .dashboard-heading p:last-child,
+:root[data-theme="dark"] .dashboard-property-card > p,
+:root[data-theme="dark"] .dashboard-empty,
+:root[data-theme="dark"] .dashboard-request > div:first-child,
+:root[data-theme="dark"] .occupant-summary { color: #b7c4bd; }
+:root[data-theme="dark"] .search-section,
+:root[data-theme="dark"] .property-card,
+:root[data-theme="dark"] .filter-panel,
+:root[data-theme="dark"] .detail-facts,
+:root[data-theme="dark"] .auth-card,
+:root[data-theme="dark"] .next-steps,
+:root[data-theme="dark"] .dashboard-section,
+:root[data-theme="dark"] .dashboard-property-card,
+:root[data-theme="dark"] .dashboard-request,
+:root[data-theme="dark"] .location-chip,
+:root[data-theme="dark"] .trust-card { border-color: #304337; }
+:root[data-theme="dark"] .location-chip { color: #dce5df; }
+:root[data-theme="dark"] .location-chip:hover { border-color: #5c7b66; background: #182e25; }
+:root[data-theme="dark"] .location-mark,
+:root[data-theme="dark"] .location-mark-1,
+:root[data-theme="dark"] .location-mark-2,
+:root[data-theme="dark"] .location-mark-3,
+:root[data-theme="dark"] .location-mark-4,
+:root[data-theme="dark"] .location-mark-5 { background: #22372b; color: #c0d8c8; }
+:root[data-theme="dark"] .location-arrow { color: #aebbb4; }
+:root[data-theme="dark"] .demo-disclaimer,
+:root[data-theme="dark"] .property-facts,
+:root[data-theme="dark"] .property-type,
+:root[data-theme="dark"] .property-address,
+:root[data-theme="dark"] .property-price > span { color: #b7c4bd; }
+:root[data-theme="dark"] .property-card h3,
+:root[data-theme="dark"] .property-price,
+:root[data-theme="dark"] .detail-facts .property-price,
+:root[data-theme="dark"] .dashboard-property-card h3,
+:root[data-theme="dark"] .dashboard-request > div:first-child strong,
+:root[data-theme="dark"] .dashboard-section h2,
+:root[data-theme="dark"] .footer-links-group strong,
+:root[data-theme="dark"] .next-steps li strong,
+:root[data-theme="dark"] .protected-notice h2 { color: #edf2ef; }
+:root[data-theme="dark"] .image-location,
+:root[data-theme="dark"] .photo-caption { background: rgba(13, 27, 42, .94); color: #edf2ef; }
+:root[data-theme="dark"] .property-facts,
+:root[data-theme="dark"] .property-card-bottom,
+:root[data-theme="dark"] .verification-steps,
+:root[data-theme="dark"] .verification-step,
+:root[data-theme="dark"] .footer-note,
+:root[data-theme="dark"] .next-steps-note,
+:root[data-theme="dark"] .auth-footer,
+:root[data-theme="dark"] .occupant-summary { border-color: #304337; }
+:root[data-theme="dark"] .verification-step .step-number,
+:root[data-theme="dark"] .next-steps li::before { color: #9ab8a3; }
+:root[data-theme="dark"] .renter-card,
+:root[data-theme="dark"] .agent-card,
+:root[data-theme="dark"] .dashboard-property-card,
+:root[data-theme="dark"] .empty-state,
+:root[data-theme="dark"] .filter-trust-note { background: #172a3d; }
+:root[data-theme="dark"] .trust-icon,
+:root[data-theme="dark"] .assurance-icon,
+:root[data-theme="dark"] .empty-state-icon,
+:root[data-theme="dark"] .protected-icon,
+:root[data-theme="dark"] .auth-benefits li > span { border-color: #3a5543; background: #20372a; color: #b8d2c0; }
+:root[data-theme="dark"] .listings-disclaimer,
+:root[data-theme="dark"] .detail-safety,
+:root[data-theme="dark"] .form-alert-warning,
+:root[data-theme="dark"] .demo-badge { border-color: #594d34; background: #30291c; color: #ecd39e; }
+:root[data-theme="dark"] .filter-trust-note { color: #b8d2c0; }
+:root[data-theme="dark"] .verification-pending,
+:root[data-theme="dark"] .verification-review,
+:root[data-theme="dark"] .verification-not-done { background: #2b3026; color: #e3d59f; }
+:root[data-theme="dark"] .verification-review { background: #20372a; color: #b8d2c0; }
+:root[data-theme="dark"] .verification-not-done { background: #382b24; color: #e3b89f; }
+:root[data-theme="dark"] .request-status { background: #26372d; color: #c5d6ca; }
+:root[data-theme="dark"] .request-status.is-pending { background: #342d1e; color: #ecd39e; }
+:root[data-theme="dark"] .request-status.is-accepted { background: #1f3829; color: #b8d9c2; }
+:root[data-theme="dark"] .request-status.is-declined { background: #3b2624; color: #e4b1a9; }
+:root[data-theme="dark"] .search-field span,
+:root[data-theme="dark"] .filter-field > span,
+:root[data-theme="dark"] .rent-filter legend,
+:root[data-theme="dark"] .dashboard-form label,
+:root[data-theme="dark"] .agent-assignment,
+:root[data-theme="dark"] .agent-rating-form label,
+:root[data-theme="dark"] .auth-field label,
+:root[data-theme="dark"] .consent-field { color: #c8d3cc; }
+:root[data-theme="dark"] .search-field select,
+:root[data-theme="dark"] .filter-field input,
+:root[data-theme="dark"] .filter-field select,
+:root[data-theme="dark"] .sort-control select,
+:root[data-theme="dark"] .auth-field input,
+:root[data-theme="dark"] .auth-field select,
+:root[data-theme="dark"] .dashboard-form input,
+:root[data-theme="dark"] .dashboard-form select,
+:root[data-theme="dark"] .dashboard-form textarea,
+:root[data-theme="dark"] .agent-assignment select,
+:root[data-theme="dark"] .agent-rating-form select {
+  border-color: #405348;
+  background: #102236;
+  color: #edf2ef;
+}
+:root[data-theme="dark"] .search-field select { background-color: #172a3d; }
+:root[data-theme="dark"] input::placeholder { color: #91a097; }
+:root[data-theme="dark"] .empty-state { border-color: #405348; }
+:root[data-theme="dark"] .filter-trust-note { background: #1b3025; }
+:root[data-theme="dark"] .filter-panel-heading h2,
+:root[data-theme="dark"] .auth-intro h1,
+:root[data-theme="dark"] .auth-card h1,
+:root[data-theme="dark"] .legal-page h1,
+:root[data-theme="dark"] .legal-page h2,
+:root[data-theme="dark"] .dashboard-heading h1,
+:root[data-theme="dark"] .listings-heading h1,
+:root[data-theme="dark"] .detail-content h1,
+:root[data-theme="dark"] .not-found h1,
+:root[data-theme="dark"] .section-heading h2,
+:root[data-theme="dark"] .verification-copy h2,
+:root[data-theme="dark"] .trust-card h3,
+:root[data-theme="dark"] .next-steps h2,
+:root[data-theme="dark"] .auth-card-heading h2,
+:root[data-theme="dark"] .dashboard-section-heading h2,
+:root[data-theme="dark"] .dashboard-section > h2 { color: #edf2ef; }
+:root[data-theme="dark"] .account-notice { border-color: #344c3c; background: #192e24; }
+:root[data-theme="dark"] .account-notice strong,
+:root[data-theme="dark"] .account-notice p { color: #c8d7ce; }
+:root[data-theme="dark"] .next-steps li { border-color: #536f5b; }
+:root[data-theme="dark"] .next-steps li > span { color: #b7c4bd; }
+:root[data-theme="dark"] .dashboard-request { background: #13263a; }
+:root[data-theme="dark"] .password-strength-heading,
+:root[data-theme="dark"] .password-requirements li,
+:root[data-theme="dark"] .field-hint,
+:root[data-theme="dark"] .optional-label { color: #aebbb4; }
+:root[data-theme="dark"] .password-strength-meter > span { background: #344539; }
+:root[data-theme="dark"] .password-requirements li.is-passed,
+:root[data-theme="dark"] .password-requirements li.is-passed > span { color: #92c7a6; }
+:root[data-theme="dark"] .password-strength-label.is-good,
+:root[data-theme="dark"] .password-strength-label.is-strong { color: #92c7a6; }
+:root[data-theme="dark"] .password-strength-meter > span.is-good,
+:root[data-theme="dark"] .password-strength-meter > span.is-strong { background: #548269; }
+:root[data-theme="dark"] .brand-name span,
+:root[data-theme="dark"] .eyebrow:not(.closing-cta .eyebrow),
+:root[data-theme="dark"] .hero-content h1 em,
+:root[data-theme="dark"] .text-link,
+:root[data-theme="dark"] .hero-discover-link,
+:root[data-theme="dark"] .back-link,
+:root[data-theme="dark"] .result-count strong,
+:root[data-theme="dark"] .auth-header-actions > a,
+:root[data-theme="dark"] .auth-card a,
+:root[data-theme="dark"] .legal-page a,
+:root[data-theme="dark"] .clear-filters,
+:root[data-theme="dark"] .password-toggle { color: var(--green-readable); }
+
+@media (max-width: 760px) {
+  .auth-header-actions { gap: 8px; }
+  .auth-header-actions > a { font-size: .75rem; white-space: nowrap; }
+  .mobile-nav-actions .theme-toggle { grid-column: 1 / -1; justify-self: start; }
 }
