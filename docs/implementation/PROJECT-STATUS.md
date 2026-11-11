@@ -40,8 +40,14 @@ The NestJS backend currently provides:
 - `GET /api/health`
 - `GET /api/listings`
 - `GET /api/verification-status`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
 
 The API listings are fictional demonstration data from a dedicated provider. The browser-only account, apartment, and tenant-request flows do not use the backend. PostgreSQL/Prisma is configured with initial listing and verification models; no demo fixtures are seeded into the database.
+
+The Phase 1 payment foundation adds persisted users/roles/sessions, landlord and agent relationship models, rental transaction and payment records, invoice/provider event models, kobo-based amounts, payment state rules, object-access policy, and append-only audit writes. These records are not yet exposed through payment APIs and do not process or hold funds.
 
 ## Demo storage and safety limitations
 
@@ -52,13 +58,14 @@ Do not use the prototype for real accounts, personal information, property recor
 ## Not yet implemented
 
 - Applying migrations against a running PostgreSQL instance remains environment-dependent.
-- Production authentication, password verification, secure sessions, and role-based server authorization.
+- Email verification, password reset, login rate limiting, administrator provisioning, and production account operations.
 - Database persistence and APIs for accounts, apartments, occupancy, and tenant requests.
 - Production identity document upload/storage, verification review, moderation, notifications, and password recovery email delivery.
 - Server-persisted agent-to-landlord/property workflows, enforceable agent ratings, and account authorization.
+- Payment transaction APIs/UI, private evidence storage, payment review/issue workflows, platform invoice management, provider adapter, checkout, webhook verification, and reconciliation.
 - Production privacy and terms policies.
 
-Before any real-world use, implement and test the backend services, persistent storage, server-enforced authorization, security controls, privacy practices, and operational workflows.
+The authentication foundation is not production-ready without email verification, rate limiting, account operations, and end-to-end security review. Before real-world use, implement and test the remaining backend services, evidence storage, payment workflows, provider approval, privacy practices, and operational controls.
 
 ## Run and validate
 

@@ -26,13 +26,17 @@ export function validateEnvironment(config: Record<string, unknown>): Environmen
   const originsValue = String(config.FRONTEND_ORIGINS ?? 'http://localhost:5173');
   const origins = originsValue.split(',').map((origin) => origin.trim()).filter(Boolean);
   for (const origin of origins) {
+    let parsedOrigin: URL;
     try {
-      const parsedOrigin = new URL(origin);
-      if (!['http:', 'https:'].includes(parsedOrigin.protocol) || parsedOrigin.origin !== origin) {
-        throw new Error();
-      }
+      parsedOrigin = new URL(origin);
     } catch {
       throw new Error('FRONTEND_ORIGINS must be a comma-separated list of valid origins.');
+    }
+    if (!['http:', 'https:'].includes(parsedOrigin.protocol) || parsedOrigin.origin !== origin) {
+      throw new Error('FRONTEND_ORIGINS must be a comma-separated list of valid origins.');
+    }
+    if (nodeEnv === 'production' && parsedOrigin.protocol !== 'https:') {
+      throw new Error('FRONTEND_ORIGINS must contain valid HTTPS production origins.');
     }
   }
 

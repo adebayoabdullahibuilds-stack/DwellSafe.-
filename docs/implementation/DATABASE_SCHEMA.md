@@ -1,6 +1,6 @@
 # Database Schema
 
-## Initial scope
+## Existing marketplace models
 
 PostgreSQL is accessed through Prisma. The initial schema includes only the entities needed to establish future listing and verification persistence:
 
@@ -27,7 +27,21 @@ The first migration is `backend/prisma/migrations/20261106230000_initial_listing
 
 ## Deferred entities
 
-The schema does not yet create users, tenant/landlord/agent profiles, property management assignments, tenant requests, occupancy, verification documents, or notifications. Their relationships, ownership rules, lifecycle, and access controls must be designed before adding migrations.
+## Phase 1 payment foundation
+
+The additive migration `20261111230500_payment_foundation` introduces:
+
+- `User`, `UserRoleAssignment`, and `Session` for persisted identity, multiple roles, and revocable opaque sessions. A role is assigned separately from a user; public registration cannot grant `ADMIN`.
+- Optional `PropertyListing.landlordId` and `PropertyAgentAuthorization` for persisted landlord ownership and explicitly authorized agent relationships.
+- `RentalTransaction` with tenant, landlord, property, optional primary agent, transaction status, currency, and terms snapshot.
+- `PaymentObligation` with itemized purpose, integer `amountMinor` (kobo), currency, intended beneficiary, a reference to securely stored payment instructions, payment route, separate obligation and settlement states.
+- `PaymentSubmission` and `PaymentEvidence` metadata. Evidence bytes must live in private storage; upload and retrieval services are not implemented in this phase.
+- `Invoice`, `PaymentAttempt`, and uniquely keyed `WebhookEvent` records to support future DwellSafe-only provider checkout.
+- `FinancialAuditLog`, append-only by database trigger. Financial foreign keys restrict deletion to preserve history.
+
+Positive-value database constraints prevent zero/negative kobo amounts and zero-byte evidence metadata. Evidence and submission claim details cannot be updated/deleted; the submission's review status remains mutable and must be audited by the application. State-transition policy rejects invalid terminal transitions and requires a reason when rejecting a submission.
+
+These models are foundations only: no payment API, provider, settlement, issue workflow, or evidence storage has been implemented.
 
 ## Local database
 

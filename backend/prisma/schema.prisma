@@ -14,19 +14,183 @@ enum VerificationDecision {
   REJECTED
 }
 
+enum UserRole {
+  TENANT
+  LANDLORD
+  AGENT
+  ADMIN
+}
+
+enum AgentAuthorizationRole {
+  PRIMARY_AGENT
+  AUTHORIZED_AGENT
+  PARTNER_AGENT
+}
+
+enum AgentAuthorizationStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+}
+
+enum RentalTransactionStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum PaymentChargeType {
+  RENT
+  AGENCY_FEE
+  LEGAL_FEE
+  OTHER
+  PLATFORM_SUBSCRIPTION
+  FEATURED_LISTING
+  VERIFICATION_SERVICE
+}
+
+enum PaymentMethodType {
+  EXTERNAL_DIRECT
+  PROVIDER_CHECKOUT
+  MANUAL_ADMIN_RECORD
+}
+
+enum PaymentObligationStatus {
+  DRAFT
+  AWAITING_PAYMENT
+  PAYMENT_SUBMITTED
+  UNDER_REVIEW
+  PARTIALLY_PAID
+  PAID
+  REJECTED
+  DISPUTED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum SettlementStatus {
+  NOT_APPLICABLE
+  PENDING
+  PROCESSING
+  SETTLED
+  FAILED
+  REVERSED
+}
+
+enum PaymentSubmissionStatus {
+  SUBMITTED
+  CONFIRMED
+  REJECTED
+  NEEDS_INFORMATION
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  VOID
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentProvider {
+  PAYSTACK
+  FLUTTERWAVE
+  MOCK
+}
+
+enum PaymentAttemptStatus {
+  CREATED
+  PENDING
+  PROCESSING
+  SUCCESSFUL
+  FAILED
+  EXPIRED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum WebhookProcessingStatus {
+  RECEIVED
+  PROCESSING
+  PROCESSED
+  FAILED
+  IGNORED
+}
+
+model User {
+  id                         String                       @id @default(uuid()) @db.Uuid
+  email                      String                       @unique @db.VarChar(320)
+  displayName                String                       @db.VarChar(200)
+  passwordHash               String                       @db.VarChar(255)
+  isDisabled                 Boolean                      @default(false)
+  createdAt                  DateTime                     @default(now()) @db.Timestamp(3)
+  updatedAt                  DateTime                     @updatedAt @db.Timestamp(3)
+  roles                      UserRoleAssignment[]
+  sessions                   Session[]
+  ownedProperties            PropertyListing[]            @relation("PropertyLandlord")
+  agentAuthorizations        PropertyAgentAuthorization[] @relation("AgentAuthorizationAgent")
+  grantedAgentAuthorizations PropertyAgentAuthorization[] @relation("AgentAuthorizationGrantor")
+  transactionsAsTenant       RentalTransaction[]          @relation("TransactionTenant")
+  transactionsAsLandlord     RentalTransaction[]          @relation("TransactionLandlord")
+  transactionsAsAgent        RentalTransaction[]          @relation("TransactionPrimaryAgent")
+  beneficiaryObligations     PaymentObligation[]          @relation("ObligationBeneficiary")
+  paymentSubmissions         PaymentSubmission[]          @relation("SubmissionSubmitter")
+  reviewedSubmissions        PaymentSubmission[]          @relation("SubmissionReviewer")
+  invoices                   Invoice[]
+  uploadedEvidence           PaymentEvidence[]
+  financialAuditEvents       FinancialAuditLog[]
+
+  @@index([isDisabled, createdAt])
+}
+
+model UserRoleAssignment {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  role      UserRole
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@index([role, userId])
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique @db.Char(64)
+  expiresAt DateTime  @db.Timestamp(3)
+  revokedAt DateTime? @db.Timestamp(3)
+  createdAt DateTime  @default(now()) @db.Timestamp(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
 model PropertyListing {
-  id           String        @id @default(uuid()) @db.Uuid
-  title        String        @db.VarChar(200)
-  location     String        @db.VarChar(200)
-  annualRent   Decimal       @db.Decimal(14, 2)
-  bedrooms     Int           @default(0)
-  bathrooms    Int           @default(0)
-  isAvailable  Boolean       @default(true)
-  createdAt    DateTime      @default(now()) @db.Timestamp(3)
-  updatedAt    DateTime      @updatedAt @db.Timestamp(3)
-  verification Verification?
+  id                  String                       @id @default(uuid()) @db.Uuid
+  title               String                       @db.VarChar(200)
+  location            String                       @db.VarChar(200)
+  annualRent          Decimal                      @db.Decimal(14, 2)
+  landlordId          String?                      @db.Uuid
+  bedrooms            Int                          @default(0)
+  bathrooms           Int                          @default(0)
+  isAvailable         Boolean                      @default(true)
+  createdAt           DateTime                     @default(now()) @db.Timestamp(3)
+  updatedAt           DateTime                     @updatedAt @db.Timestamp(3)
+  verification        Verification?
+  landlord            User?                        @relation("PropertyLandlord", fields: [landlordId], references: [id], onDelete: Restrict)
+  agentAuthorizations PropertyAgentAuthorization[]
+  rentalTransactions  RentalTransaction[]
 
   @@index([isAvailable, location])
+  @@index([landlordId])
 }
 
 model Verification {
@@ -39,4 +203,184 @@ model Verification {
   listing   PropertyListing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([decision, updatedAt])
+}
+
+model PropertyAgentAuthorization {
+  id                 String                   @id @default(uuid()) @db.Uuid
+  propertyId         String                   @db.Uuid
+  agentUserId        String                   @db.Uuid
+  authorizedByUserId String?                  @db.Uuid
+  role               AgentAuthorizationRole
+  status             AgentAuthorizationStatus @default(PENDING)
+  createdAt          DateTime                 @default(now()) @db.Timestamp(3)
+  updatedAt          DateTime                 @updatedAt @db.Timestamp(3)
+  property           PropertyListing          @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  agent              User                     @relation("AgentAuthorizationAgent", fields: [agentUserId], references: [id], onDelete: Restrict)
+  authorizedBy       User?                    @relation("AgentAuthorizationGrantor", fields: [authorizedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([propertyId, agentUserId, status])
+  @@index([agentUserId, status])
+}
+
+model RentalTransaction {
+  id             String                  @id @default(uuid()) @db.Uuid
+  propertyId     String                  @db.Uuid
+  tenantId       String                  @db.Uuid
+  landlordId     String                  @db.Uuid
+  primaryAgentId String?                 @db.Uuid
+  status         RentalTransactionStatus @default(DRAFT)
+  currency       String                  @default("NGN") @db.Char(3)
+  termsSnapshot  Json?
+  createdAt      DateTime                @default(now()) @db.Timestamp(3)
+  updatedAt      DateTime                @updatedAt @db.Timestamp(3)
+  property       PropertyListing         @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  tenant         User                    @relation("TransactionTenant", fields: [tenantId], references: [id], onDelete: Restrict)
+  landlord       User                    @relation("TransactionLandlord", fields: [landlordId], references: [id], onDelete: Restrict)
+  primaryAgent   User?                   @relation("TransactionPrimaryAgent", fields: [primaryAgentId], references: [id], onDelete: Restrict)
+  obligations    PaymentObligation[]
+
+  @@index([propertyId, status])
+  @@index([tenantId, status])
+  @@index([landlordId, status])
+  @@index([primaryAgentId, status])
+}
+
+model PaymentObligation {
+  id                                     String                  @id @default(uuid()) @db.Uuid
+  rentalTransactionId                    String?                 @db.Uuid
+  invoiceId                              String?                 @db.Uuid
+  chargeType                             PaymentChargeType
+  description                            String                  @db.VarChar(500)
+  amountMinor                            BigInt
+  currency                               String                  @default("NGN") @db.Char(3)
+  beneficiaryUserId                      String?                 @db.Uuid
+  beneficiaryNameSnapshot                String                  @db.VarChar(200)
+  beneficiaryAccountInstructionReference String?                 @db.VarChar(200)
+  paymentMethodType                      PaymentMethodType
+  status                                 PaymentObligationStatus @default(DRAFT)
+  settlementStatus                       SettlementStatus        @default(NOT_APPLICABLE)
+  dueAt                                  DateTime?               @db.Timestamp(3)
+  createdAt                              DateTime                @default(now()) @db.Timestamp(3)
+  updatedAt                              DateTime                @updatedAt @db.Timestamp(3)
+  rentalTransaction                      RentalTransaction?      @relation(fields: [rentalTransactionId], references: [id], onDelete: Restrict)
+  invoice                                Invoice?                @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  beneficiary                            User?                   @relation("ObligationBeneficiary", fields: [beneficiaryUserId], references: [id], onDelete: Restrict)
+  submissions                            PaymentSubmission[]
+
+  @@index([rentalTransactionId, status])
+  @@index([invoiceId])
+  @@index([beneficiaryUserId, status])
+  @@index([chargeType, status])
+}
+
+model PaymentSubmission {
+  id                  String                  @id @default(uuid()) @db.Uuid
+  paymentObligationId String                  @db.Uuid
+  submittedByUserId   String                  @db.Uuid
+  amountMinor         BigInt
+  currency            String                  @default("NGN") @db.Char(3)
+  paymentReference    String                  @db.VarChar(200)
+  paymentDate         DateTime                @db.Date
+  status              PaymentSubmissionStatus @default(SUBMITTED)
+  reviewedByUserId    String?                 @db.Uuid
+  reviewedAt          DateTime?               @db.Timestamp(3)
+  reviewNote          String?                 @db.VarChar(1000)
+  createdAt           DateTime                @default(now()) @db.Timestamp(3)
+  paymentObligation   PaymentObligation       @relation(fields: [paymentObligationId], references: [id], onDelete: Restrict)
+  submittedBy         User                    @relation("SubmissionSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+  reviewedBy          User?                   @relation("SubmissionReviewer", fields: [reviewedByUserId], references: [id], onDelete: Restrict)
+  evidence            PaymentEvidence[]
+
+  @@index([paymentObligationId, status, createdAt])
+  @@index([submittedByUserId, createdAt])
+  @@index([reviewedByUserId, reviewedAt])
+}
+
+model PaymentEvidence {
+  id                  String            @id @default(uuid()) @db.Uuid
+  paymentSubmissionId String            @db.Uuid
+  uploadedByUserId    String            @db.Uuid
+  storageKey          String            @unique @db.VarChar(500)
+  originalFileName    String            @db.VarChar(255)
+  mediaType           String            @db.VarChar(100)
+  sizeBytes           BigInt
+  sha256              String            @db.Char(64)
+  createdAt           DateTime          @default(now()) @db.Timestamp(3)
+  paymentSubmission   PaymentSubmission @relation(fields: [paymentSubmissionId], references: [id], onDelete: Restrict)
+  uploadedBy          User              @relation(fields: [uploadedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([paymentSubmissionId, createdAt])
+  @@index([uploadedByUserId, createdAt])
+}
+
+model Invoice {
+  id              String              @id @default(uuid()) @db.Uuid
+  invoiceNumber   String              @unique @db.VarChar(40)
+  customerUserId  String              @db.Uuid
+  description     String              @db.VarChar(500)
+  amountMinor     BigInt
+  currency        String              @default("NGN") @db.Char(3)
+  status          InvoiceStatus       @default(DRAFT)
+  issuedAt        DateTime?           @db.Timestamp(3)
+  dueAt           DateTime?           @db.Timestamp(3)
+  createdAt       DateTime            @default(now()) @db.Timestamp(3)
+  updatedAt       DateTime            @updatedAt @db.Timestamp(3)
+  customer        User                @relation(fields: [customerUserId], references: [id], onDelete: Restrict)
+  obligations     PaymentObligation[]
+  paymentAttempts PaymentAttempt[]
+
+  @@index([customerUserId, status, createdAt])
+  @@index([status, dueAt])
+}
+
+model PaymentAttempt {
+  id                String               @id @default(uuid()) @db.Uuid
+  invoiceId         String               @db.Uuid
+  provider          PaymentProvider
+  providerReference String               @unique @db.VarChar(200)
+  checkoutUrl       String?              @db.Text
+  amountMinor       BigInt
+  currency          String               @default("NGN") @db.Char(3)
+  status            PaymentAttemptStatus @default(CREATED)
+  initiatedAt       DateTime             @default(now()) @db.Timestamp(3)
+  verifiedAt        DateTime?            @db.Timestamp(3)
+  failureCode       String?              @db.VarChar(100)
+  failureMessage    String?              @db.VarChar(500)
+  invoice           Invoice              @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([invoiceId, status, initiatedAt])
+}
+
+model WebhookEvent {
+  id                String                  @id @default(uuid()) @db.Uuid
+  provider          PaymentProvider
+  providerEventId   String                  @db.VarChar(200)
+  eventType         String                  @db.VarChar(200)
+  providerReference String?                 @db.VarChar(200)
+  signatureValid    Boolean
+  processingStatus  WebhookProcessingStatus @default(RECEIVED)
+  payloadRedacted   Json?
+  receivedAt        DateTime                @default(now()) @db.Timestamp(3)
+  processedAt       DateTime?               @db.Timestamp(3)
+
+  @@unique([provider, providerEventId])
+  @@index([providerReference, processingStatus])
+  @@index([processingStatus, receivedAt])
+}
+
+model FinancialAuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  actorUserId   String?  @db.Uuid
+  entityType    String   @db.VarChar(100)
+  entityId      String   @db.Uuid
+  action        String   @db.VarChar(100)
+  previousState Json?
+  newState      Json?
+  reason        String?  @db.VarChar(1000)
+  requestId     String?  @db.VarChar(100)
+  createdAt     DateTime @default(now()) @db.Timestamp(3)
+  actor         User?    @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorUserId, createdAt])
 }

@@ -2,6 +2,23 @@
 
 Base path: `/api`. Interactive Swagger documentation is available at `/api/docs` outside production.
 
+## Authentication foundation
+
+The backend now provides:
+
+- `POST /api/auth/register` — create a tenant, landlord, or agent account and start a session. The request accepts `email`, `displayName`, `password` (12–128 characters), and a non-admin `role`.
+- `POST /api/auth/login` — authenticate with `email` and `password`.
+- `POST /api/auth/logout` — revoke the current session.
+- `GET /api/auth/me` — return the server-derived user ID and assigned roles for the current session.
+
+Successful registration/login set a random opaque session token in an `HttpOnly`, `SameSite=Lax` cookie; production cookies also use `Secure`. The database stores only the token hash. Credentialed CORS and allowed-origin checks protect browser session requests. Use HTTPS in production.
+
+This is not a complete production identity lifecycle: email verification, password reset, login rate limiting, administrator provisioning, and account moderation are not implemented. The frontend demo sign-in is unchanged and does not use this API. Do not use client-selected roles as authority.
+
+## Payment foundation status
+
+Prisma models, role/object-access policy, payment state-transition rules, and append-only audit writes are present. No transaction, obligation, submission, invoice, checkout, status, webhook, or evidence API is enabled yet. No provider is configured. Do not infer or display successful payment from a client redirect or submitted evidence.
+
 ## `GET /api/health`
 
 Checks the application and attempts a lightweight PostgreSQL query.
@@ -78,4 +95,4 @@ Unhandled API exceptions use the consistent JSON response:
 }
 ```
 
-Expected Nest HTTP errors retain their status and validation messages. No API in this milestone accepts a request body or implements registration/authentication.
+Expected Nest HTTP errors retain their status and validation messages. Auth request DTOs use the global whitelist and validation pipe.

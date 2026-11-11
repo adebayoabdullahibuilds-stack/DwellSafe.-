@@ -38,6 +38,10 @@ describe('DwellSafe API endpoints', () => {
     expect(response.body.timestamp).toEqual(expect.any(String));
   });
 
+  it('requires a server session for the current-user endpoint', async () => {
+    await request(app.getHttpServer()).get('/api/auth/me').expect(401);
+  });
+
   it('preserves the demo listings API response structure', async () => {
     const response = await request(app.getHttpServer()).get('/api/listings').expect(200);
     expect(response.body).toHaveLength(3);

@@ -5,6 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { CorsOptions } from 'cors';
 import express from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
@@ -25,9 +26,25 @@ async function bootstrap() {
       }
       callback(null, false);
     },
-    methods: ['GET', 'HEAD', 'OPTIONS'],
+    methods: ['GET', 'HEAD', 'OPTIONS', 'POST'],
+    credentials: true,
   };
   app.enableCors(corsOptions);
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    const unsafeMethod = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method);
+    const origin = request.get('origin');
+    if (unsafeMethod && origin && !allowedOrigins.includes(origin)) {
+      response.status(403).json({
+        statusCode: 403,
+        error: 'Forbidden',
+        message: 'Request origin is not allowed.',
+        path: request.path,
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+    next();
+  });
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     whitelist: true,

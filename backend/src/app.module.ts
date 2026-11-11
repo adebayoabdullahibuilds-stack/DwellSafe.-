@@ -5,6 +5,8 @@ import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { ListingsModule } from './listings/listings.module';
 import { VerificationModule } from './verification/verification.module';
+import { AuthModule } from './auth/auth.module';
+import { PaymentsFoundationModule } from './payments/payments-foundation.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { VerificationModule } from './verification/verification.module';
     HealthModule,
     ListingsModule,
     VerificationModule,
+    AuthModule,
+    PaymentsFoundationModule,
   ],
 })
 export class AppModule {}
