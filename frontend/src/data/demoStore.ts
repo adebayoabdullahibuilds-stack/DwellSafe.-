@@ -144,6 +144,12 @@ export function createDemoAccount(account: Omit<DemoAccount, 'id' | 'identityDoc
   if (state.accounts.some((saved) => saved.email.toLowerCase() === account.email.toLowerCase())) {
     throw new Error('An account with this email already exists in this browser. Sign in or use another email.');
   }
+  if (account.role === 'agent' && account.agentOnboardingMethod === 'landlord') {
+    const landlordExists = state.accounts.some((saved) => saved.id === account.verifyingLandlordId && saved.role === 'landlord');
+    if (!landlordExists) {
+      throw new Error('Choose a valid landlord for landlord verification when creating this demo agent account.');
+    }
+  }
 
   const created: DemoAccount = {
     ...account,
@@ -201,6 +207,9 @@ export function reviewDemoAgent(landlordId: string, agentId: string, status: 've
   const landlord = state.accounts.find((saved) => saved.id === landlordId && saved.role === 'landlord');
   const agent = state.accounts.find((saved) => saved.id === agentId && saved.role === 'agent');
   if (!landlord || !agent) throw new Error('The landlord or agent account could not be found.');
+  if (agent.agentOnboardingStatus !== 'pending') {
+    throw new Error('This agent onboarding request is no longer pending.');
+  }
   if (agent.verifyingLandlordId && agent.verifyingLandlordId !== landlordId) {
     throw new Error('Only the landlord selected by this agent can review this onboarding request.');
   }
