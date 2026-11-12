@@ -210,8 +210,9 @@ export function reviewDemoAgent(landlordId: string, agentId: string, status: 've
   if (agent.agentOnboardingStatus !== 'pending') {
     throw new Error('This agent onboarding request is no longer pending.');
   }
-  if (agent.verifyingLandlordId && agent.verifyingLandlordId !== landlordId) {
-    throw new Error('Only the landlord selected by this agent can review this onboarding request.');
+  if (agent.agentOnboardingMethod !== 'landlord' || agent.verifyingLandlordId !== landlordId) {
+    throw new Error('Only the landlord specifically designated by this agent can review this onboarding request.');
+  }
   }
 
   writeDemoState({

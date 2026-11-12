@@ -20,12 +20,14 @@
     "@nestjs/core": "^11.1.6",
     "@nestjs/platform-express": "^11.1.6",
     "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.7.1",
     "@prisma/client": "^6.19.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
+    "helmet": "^8.3.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
@@ -48,7 +50,16 @@
     "testEnvironment": "node",
     "rootDir": ".",
     "testRegex": "src/.*\\.spec\\.ts$",
-    "moduleFileExtensions": ["ts", "js", "json"],
-    "collectCoverageFrom": ["src/**/*.ts", "!src/main.ts", "!src/**/*.module.ts", "!src/**/*.spec.ts"]
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/main.ts",
+      "!src/**/*.module.ts",
+      "!src/**/*.spec.ts"
+    ]
   }
 }

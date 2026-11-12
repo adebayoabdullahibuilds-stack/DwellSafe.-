@@ -200,7 +200,7 @@ model Verification {
   notes     String?              @db.Text
   createdAt DateTime             @default(now()) @db.Timestamp(3)
   updatedAt DateTime             @updatedAt @db.Timestamp(3)
-  listing   PropertyListing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listing   PropertyListing      @relation(fields: [listingId], references: [id], onDelete: Restrict)
 
   @@index([decision, updatedAt])
 }

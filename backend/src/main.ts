@@ -6,6 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { CorsOptions } from 'cors';
 import express from 'express';
 import type { NextFunction, Request, Response } from 'express';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
@@ -14,6 +15,21 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const nodeEnv = config.get<string>('NODE_ENV', 'development');
   const allowedOrigins = config.get<string[]>('FRONTEND_ORIGINS', []);
+
+  app.use(helmet({
+    contentSecurityPolicy: nodeEnv === 'production' ? {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        frameAncestors: ["'none'"],
+      },
+    } : false,
+    frameguard: { action: 'deny' },
+    hidePoweredBy: true,
+    hsts: nodeEnv === 'production' ? { maxAge: 31536000, includeSubDomains: true } : false,
+  }));
 
   app.use(express.json({ limit: '100kb' }));
   app.use(express.urlencoded({ extended: false, limit: '100kb' }));

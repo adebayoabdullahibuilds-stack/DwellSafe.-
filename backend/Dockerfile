@@ -13,4 +13,5 @@ RUN npm run build --workspace backend
 
 ENV NODE_ENV=production
 EXPOSE 4000
+USER node
 CMD ["npm", "run", "start", "--workspace", "backend"]

@@ -72,6 +72,9 @@ function IdentityVerificationPanel({ account, onResult }: { account: DemoAccount
         Status: <strong>{account.identityStatus === 'pending' ? 'Pending review' : 'Not submitted'}</strong>
         {account.identityDocumentType && <> · Document type: {account.identityDocumentType === 'nin' ? 'NIN' : account.identityDocumentType === 'voters-card' ? 'Voter’s card' : 'Driver’s license'}</>}
       </p>
+      <div className="form-alert form-alert-warning" role="alert">
+        <strong>Privacy & Security Warning:</strong> Do not upload real government-issued identity documents (NIN slips, voter’s cards, or driver’s licenses) in this demonstration environment. Real document verification requires encrypted server-side KMS storage and audited verification reviewers.
+      </div>
       <form className="dashboard-form identity-form" onSubmit={handleSubmit}>
         <label>Document type
           <select name="documentType" defaultValue="" required>
@@ -134,7 +137,8 @@ export function DashboardPage({ role }: { role: RegistrationRole }) {
     const verifiedAgents = data.accounts.filter((person) => person.role === 'agent' && person.agentOnboardingStatus === 'verified');
     const pendingAgents = data.accounts.filter((person) => person.role === 'agent'
       && person.agentOnboardingStatus === 'pending'
-      && (!person.verifyingLandlordId || person.verifyingLandlordId === account.id));
+      && person.agentOnboardingMethod === 'landlord'
+      && person.verifyingLandlordId === account.id);
     const apartmentIds = new Set(apartments.map((apartment) => apartment.id));
     const pendingRequests = data.requests.filter(
       (request) => apartmentIds.has(request.apartmentId) && request.status === 'pending',

@@ -165,22 +165,27 @@ function PropertyActions({ listing, agentPhone }: { listing: PropertyListing; ag
     ? `https://wa.me/${agentNumber}?text=${encodeURIComponent(`Hi, I'm enquiring about ${listing.title}: ${listingUrl}`)}`
     : null;
   const groupUrl = import.meta.env.VITE_DWELLSAFE_WHATSAPP_GROUP_URL?.trim();
-  const validGroupUrl = groupUrl?.startsWith('https://chat.whatsapp.com/') ? groupUrl : null;
+  const validGroupUrl = groupUrl && /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9_-]+$/.test(groupUrl) ? groupUrl : null;
 
   return (
-    <div className="property-contact-actions">
-      <a className="button button-outline" href={shareUrl} target="_blank" rel="noopener noreferrer">
-        Share on WhatsApp
-      </a>
-      {inquiryUrl ? (
-        <a className="button button-primary" href={inquiryUrl} target="_blank" rel="noopener noreferrer">
-          Ask agent on WhatsApp
+    <div className="property-contact-actions-wrap">
+      <div className="property-contact-actions">
+        <a className="button button-outline" href={shareUrl} target="_blank" rel="noopener noreferrer">
+          Share on WhatsApp
         </a>
-      ) : validGroupUrl ? (
-        <a className="button button-primary" href={validGroupUrl} target="_blank" rel="noopener noreferrer">
-          WhatsApp inquiry group
-        </a>
-      ) : null}
+        {inquiryUrl ? (
+          <a className="button button-primary" href={inquiryUrl} target="_blank" rel="noopener noreferrer">
+            Ask agent on WhatsApp
+          </a>
+        ) : validGroupUrl ? (
+          <a className="button button-primary" href={validGroupUrl} target="_blank" rel="noopener noreferrer">
+            WhatsApp inquiry group
+          </a>
+        ) : null}
+      </div>
+      <p className="property-anti-scam-notice">
+        <span aria-hidden="true">🛡️</span> <strong>Anti-Scam Notice:</strong> Never transfer inspection fees or deposits off-platform. Inspect in person before making any commitments.
+      </p>
     </div>
   );
 }
