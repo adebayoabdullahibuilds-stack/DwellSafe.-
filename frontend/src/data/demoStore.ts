@@ -213,7 +213,6 @@ export function reviewDemoAgent(landlordId: string, agentId: string, status: 've
   if (agent.agentOnboardingMethod !== 'landlord' || agent.verifyingLandlordId !== landlordId) {
     throw new Error('Only the landlord specifically designated by this agent can review this onboarding request.');
   }
-  }
 
   writeDemoState({
     ...state,
