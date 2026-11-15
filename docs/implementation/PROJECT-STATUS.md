@@ -26,9 +26,12 @@ DwellSafe is an early-stage housing marketplace prototype focused on helping peo
 ### Tenant and landlord workflows
 
 - Landlord dashboard to add apartments, assign verified demo agents, see occupants, review tenant requests, and review agent onboarding.
-- Tenant dashboard to view an assigned apartment, request statuses, and the landlord-agent-tenant connection chain.
+- Tenant dashboard to view an assigned apartment, request statuses, and the landlord-agent-tenant connection chain, with a direct route back to search.
 - Tenants can request landlord-created apartments from the property search results.
 - Landlords can accept or decline requests. Accepting a request assigns the tenant as the apartment's occupant.
+- Landlords can see portfolio-wide counts of housed tenants, occupied units, and vacant units, plus the occupancy status and tenant count for each apartment.
+- Agents can see how many distinct tenants occupy their assigned apartments, per-unit occupancy, and separate tenant inquiry statuses.
+- Prospective tenants can create a demo account, search homes, and use the WhatsApp contact action on listings with an assigned agent contact.
 - Tenant search can filter both fictional sample listings and demo apartments by category, location, and rent.
 - Agents can self-onboard or request a named landlord's relationship verification, view assigned properties and tenant connections, and receive ratings from tenants with accepted requests.
 - Tenants, landlords, and agents share a demo identity-verification flow for NIN, voter-card, or driver's-license document categories. It records only the category and a pending status; it does not transmit or store selected files or collect ID numbers.

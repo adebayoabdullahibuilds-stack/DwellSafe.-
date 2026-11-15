@@ -466,6 +466,10 @@ h1, h2, h3, p { margin-top: 0; }
 .dashboard-section { padding: 22px; border: 1px solid #e3e9e3; border-radius: 7px; background: #fff; }
 .dashboard-section > h2, .dashboard-section-heading h2 { margin: 0 0 15px; font-family: 'Manrope', sans-serif; font-size: 1.35rem; letter-spacing: -.035em; }
 .dashboard-section .eyebrow { margin-bottom: 5px; font-size: .67rem; }
+.dashboard-metrics { margin: 14px 0 17px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.dashboard-metrics > div { min-height: 76px; padding: 12px 14px; display: grid; align-content: center; gap: 3px; border: 1px solid #e5eae5; border-radius: 6px; background: #fbfcfb; }
+.dashboard-metrics strong { color: var(--green); font-family: 'Manrope', sans-serif; font-size: 1.4rem; line-height: 1.1; }
+.dashboard-metrics span { color: #68756c; font-size: .73rem; }
 .dashboard-property-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
 .dashboard-property-card { padding: 17px; border: 1px solid #e5eae5; border-radius: 6px; background: #fbfcfb; }
 .dashboard-property-card h3 { margin: 5px 0 8px; color: #293c30; font-size: 1.05rem; }
@@ -730,7 +734,8 @@ h1, h2, h3, p { margin-top: 0; }
 :root[data-theme="dark"] .dashboard-property-card > p,
 :root[data-theme="dark"] .dashboard-empty,
 :root[data-theme="dark"] .dashboard-request > div:first-child,
-:root[data-theme="dark"] .occupant-summary { color: #b7c4bd; }
+:root[data-theme="dark"] .occupant-summary,
+:root[data-theme="dark"] .dashboard-metrics span { color: #b7c4bd; }
 :root[data-theme="dark"] .search-section,
 :root[data-theme="dark"] .property-card,
 :root[data-theme="dark"] .filter-panel,
@@ -740,6 +745,7 @@ h1, h2, h3, p { margin-top: 0; }
 :root[data-theme="dark"] .dashboard-section,
 :root[data-theme="dark"] .dashboard-property-card,
 :root[data-theme="dark"] .dashboard-request,
+:root[data-theme="dark"] .dashboard-metrics > div,
 :root[data-theme="dark"] .location-chip,
 :root[data-theme="dark"] .trust-card { border-color: #304337; }
 :root[data-theme="dark"] .location-chip { color: #dce5df; }
@@ -762,6 +768,7 @@ h1, h2, h3, p { margin-top: 0; }
 :root[data-theme="dark"] .dashboard-property-card h3,
 :root[data-theme="dark"] .dashboard-request > div:first-child strong,
 :root[data-theme="dark"] .dashboard-section h2,
+:root[data-theme="dark"] .dashboard-metrics strong,
 :root[data-theme="dark"] .footer-links-group strong,
 :root[data-theme="dark"] .next-steps li strong,
 :root[data-theme="dark"] .protected-notice h2 { color: #edf2ef; }
@@ -780,6 +787,7 @@ h1, h2, h3, p { margin-top: 0; }
 :root[data-theme="dark"] .renter-card,
 :root[data-theme="dark"] .agent-card,
 :root[data-theme="dark"] .dashboard-property-card,
+:root[data-theme="dark"] .dashboard-metrics > div,
 :root[data-theme="dark"] .empty-state,
 :root[data-theme="dark"] .filter-trust-note { background: #172a3d; }
 :root[data-theme="dark"] .trust-icon,

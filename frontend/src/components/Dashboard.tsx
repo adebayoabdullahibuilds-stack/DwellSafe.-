@@ -134,6 +134,8 @@ export function DashboardPage({ role }: { role: RegistrationRole }) {
 
   if (role === 'landlord') {
     const apartments = data.apartments.filter((apartment) => apartment.landlordId === account.id);
+    const occupiedApartments = apartments.filter((apartment) => apartment.occupantId !== null);
+    const tenantCount = new Set(occupiedApartments.map((apartment) => apartment.occupantId)).size;
     const verifiedAgents = data.accounts.filter((person) => person.role === 'agent' && person.agentOnboardingStatus === 'verified');
     const pendingAgents = data.accounts.filter((person) => person.role === 'agent'
       && person.agentOnboardingStatus === 'pending'
@@ -239,7 +241,12 @@ export function DashboardPage({ role }: { role: RegistrationRole }) {
           </section>
 
           <section className="dashboard-section">
-            <div className="dashboard-section-heading"><div><p className="eyebrow">Your portfolio</p><h2>Apartments and occupants</h2></div><span className="result-count"><strong>{apartments.length}</strong><span>{apartments.length === 1 ? 'apartment' : 'apartments'}</span></span></div>
+            <div className="dashboard-section-heading"><div><p className="eyebrow">Your portfolio</p><h2>Apartments and occupancy</h2></div><span className="result-count"><strong>{apartments.length}</strong><span>{apartments.length === 1 ? 'apartment' : 'apartments'}</span></span></div>
+            <div className="dashboard-metrics" aria-label="Portfolio occupancy">
+              <div><strong>{tenantCount}</strong><span>{tenantCount === 1 ? 'tenant housed' : 'tenants housed'}</span></div>
+              <div><strong>{occupiedApartments.length}</strong><span>{occupiedApartments.length === 1 ? 'unit occupied' : 'units occupied'}</span></div>
+              <div><strong>{apartments.length - occupiedApartments.length}</strong><span>{apartments.length - occupiedApartments.length === 1 ? 'unit vacant' : 'units vacant'}</span></div>
+            </div>
             {apartments.length ? (
               <div className="dashboard-property-grid">
                 {apartments.map((apartment) => {
@@ -257,7 +264,7 @@ export function DashboardPage({ role }: { role: RegistrationRole }) {
                         </select>
                       </label>
                       <div className="occupant-summary">
-                        <strong>{occupant ? 'Current occupant' : 'No occupant yet'}</strong>
+                        <strong>{occupant ? 'Occupied · 1 tenant' : 'Vacant · 0 tenants'}</strong>
                         {occupant && <span>{occupant.name} · {occupant.email}</span>}
                       </div>
                     </article>
@@ -390,11 +397,15 @@ export function DashboardPage({ role }: { role: RegistrationRole }) {
               </div>
             ) : <p className="dashboard-empty">You have not requested an apartment yet.</p>}
           </section>
-          <a className="button button-primary" href="/properties">Search homes by category</a>
+          <a className="button button-primary" href="/properties">Search homes and contact agents</a>
         </main>
       </AuthLayout>
     );
   }
+
+  const assignedApartments = data.apartments.filter((apartment) => apartment.agentId === account.id);
+  const occupiedApartments = assignedApartments.filter((apartment) => apartment.occupantId !== null);
+  const housedTenantIds = new Set(occupiedApartments.map((apartment) => apartment.occupantId));
 
   return (
     <AuthLayout>
@@ -418,19 +429,26 @@ export function DashboardPage({ role }: { role: RegistrationRole }) {
         </section>
         <section className="dashboard-section">
           <p className="eyebrow">Landlord network</p>
-          <h2>Assigned properties</h2>
-          {data.apartments.some((apartment) => apartment.agentId === account.id) ? (
+          <h2>Assigned properties and tenants housed</h2>
+          <div className="dashboard-metrics" aria-label="Agent occupancy">
+            <div><strong>{housedTenantIds.size}</strong><span>{housedTenantIds.size === 1 ? 'tenant housed' : 'tenants housed'}</span></div>
+            <div><strong>{occupiedApartments.length}</strong><span>{occupiedApartments.length === 1 ? 'assigned unit occupied' : 'assigned units occupied'}</span></div>
+            <div><strong>{assignedApartments.length - occupiedApartments.length}</strong><span>{assignedApartments.length - occupiedApartments.length === 1 ? 'assigned unit vacant' : 'assigned units vacant'}</span></div>
+          </div>
+          {assignedApartments.length ? (
             <div className="dashboard-property-grid">
-              {data.apartments.filter((apartment) => apartment.agentId === account.id).map((apartment) => {
+              {assignedApartments.map((apartment) => {
                 const landlord = data.accounts.find((person) => person.id === apartment.landlordId);
                 const tenantRequests = data.requests.filter((request) => request.apartmentId === apartment.id && request.agentId === account.id);
+                const occupant = data.accounts.find((person) => person.id === apartment.occupantId);
                 return (
                   <article className="dashboard-property-card" key={apartment.id}>
                     <p className="property-type">{apartment.propertyType}</p>
                     <h3>{apartment.title}</h3>
                     <p>{apartment.neighborhood}, {apartment.location}, {apartment.state}</p>
                     <div className="occupant-summary"><strong>Landlord</strong><span>{landlord?.name ?? 'Unknown landlord'}</span></div>
-                    <div className="occupant-summary"><strong>Tenant connections</strong><span>{tenantRequests.length ? tenantRequests.map((request) => {
+                    <div className="occupant-summary"><strong>{occupant ? 'Occupied · 1 tenant housed' : 'Vacant · 0 tenants housed'}</strong>{occupant && <span>{occupant.name}</span>}</div>
+                    <div className="occupant-summary"><strong>Tenant inquiries</strong><span>{tenantRequests.length ? tenantRequests.map((request) => {
                       const tenant = data.accounts.find((person) => person.id === request.tenantId);
                       return `${tenant?.name ?? 'Tenant'} (${request.status})`;
                     }).join(' · ') : 'No requests yet'}</span></div>

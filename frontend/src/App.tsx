@@ -175,7 +175,7 @@ function PropertyActions({ listing, agentPhone }: { listing: PropertyListing; ag
         </a>
         {inquiryUrl ? (
           <a className="button button-primary" href={inquiryUrl} target="_blank" rel="noopener noreferrer">
-            Ask agent on WhatsApp
+            Contact agent on WhatsApp
           </a>
         ) : validGroupUrl ? (
           <a className="button button-primary" href={validGroupUrl} target="_blank" rel="noopener noreferrer">
